@@ -126,7 +126,7 @@ tic;
 
 
 %% --- Reuse saved selection/IDs instead of recomputing ---
-S = load('Bendersdecomposition_PETS_Qiu_SP/rome_location_data_6000_nodes/location_data_sample_1/location_data_r4_user1.mat', ...
+S = load('Bendersdecomposition/rome_location_data_2000_nodes/location_data_sample_1/location_data_r1_user1.mat', ...
          'lon_sel','lat_sel','node_tar','obf_ID');   % add 'LR_ID' if you need it later
 
 % Treat the saved selected set as your "original" set
@@ -138,7 +138,7 @@ num_points = min(200, numel(S.lon_sel));
 original_longitude  = S.lon_sel(1:num_points);
 original_latitude   = S.lat_sel(1:num_points);
 
-R = load('Bendersdecomposition_PETS_Qiu_SP/rome_location_data_6000_nodes/location_data_sample_1/location_data_r4_user1.mat','LR_ID');
+R = load('Bendersdecomposition/rome_location_data_2000_nodes/location_data_sample_1/location_data_r1_user1.mat','LR_ID');
 nearest_longitude = S.lon_sel(R.LR_ID);
 nearest_latitude  = S.lat_sel(R.LR_ID);
 
@@ -379,7 +379,17 @@ time_cost_distance = toc;
 
 
 
-tic;  
+tic;
+iter_count   = zeros(num_locations,1);
+t_total_fit  = zeros(num_locations,1);
+t_swap_sum   = zeros(num_locations,1);
+t_fmin_sum   = zeros(num_locations,1);
+converged    = false(num_locations,1);
+loss_final   = zeros(num_locations,1);
+stop_reason  = cell(num_locations,1);
+stats_store = cell(num_locations,1);
+
+
 NUM_CENTRES = 25;                              % try 9, 16, 25 … larger ⇒ more flexible, slower
 % n = CARDINALITY_N;
 n = size(original_distance_matrices{1}, 1);   % first A1 gives n
@@ -402,7 +412,21 @@ for i = 1:num_locations
     A3 = cost_coefficient_matrices{i};
 
     % Call your reordering and visualization function
-    [best_pi, best_w{i}, GF1{i}, GF2{i}, GF3{i}] = reorder_fit_rbfs(A1, A2, A3, NUM_CENTRES, SIGMA, lambda2, lambda3);
+    % [best_pi, best_w{i}, GF1{i}, GF2{i}, GF3{i}] = reorder_fit_rbfs(A1, A2, A3, NUM_CENTRES, SIGMA, lambda2, lambda3);
+
+    [best_pi{i}, best_w{i}, GF1{i}, GF2{i}, GF3{i}, stats_i] = ...
+    reorder_fit_rbfs_(A1, A2, A3, NUM_CENTRES, SIGMA, lambda2, lambda3);
+    
+    stats_store{i}  = stats_i;
+    iter_count(i)   = stats_i.outer_iters;
+    t_total_fit(i)  = stats_i.time_total;
+    t_swap_sum(i)   = sum(stats_i.time_swap);
+    t_fmin_sum(i)   = stats_i.time_fit_init + sum(stats_i.time_fit);
+    converged(i)    = stats_i.converged;
+    stop_reason{i}  = stats_i.stop_reason;
+    loss_final(i)   = stats_i.loss_hist(end);
+    
+
 
     F1_norm{i} = best_w{i}(1:NUM_CENTRES);
     F2_norm{i} = best_w{i}(NUM_CENTRES+1:2*NUM_CENTRES);
@@ -418,6 +442,426 @@ for i = 1:num_locations
 
     utility_loss(i) = norm(A3_trimmed - B3_trimmed, 'fro');
 end
+
+
+t_total = t_total_fit(:);
+t_swap  = t_swap_sum(:);
+t_fit   = t_fmin_sum(:);     % (init + loop fits)
+
+swap_frac = 100 * (t_swap ./ t_total);
+fit_frac  = 100 * (t_fit  ./ t_total);
+
+t_fit_init = zeros(num_locations,1);
+t_fit_loop = zeros(num_locations,1);
+swap_evals_total   = zeros(num_locations,1);
+swap_accepts_total = zeros(num_locations,1);
+
+for k = 1:num_locations
+    t_fit_init(k) = stats_store{k}.time_fit_init;
+    t_fit_loop(k) = sum(stats_store{k}.time_fit);
+    swap_evals_total(k)   = sum(stats_store{k}.swap_evals);
+    swap_accepts_total(k) = sum(stats_store{k}.swap_accepts);
+end
+
+ResultsRBFTime = table((1:num_locations)', iter_count(:), converged(:), stop_reason(:), ...
+    t_total, t_swap, t_fit_init, t_fit_loop, t_fit, swap_frac, fit_frac, ...
+    swap_evals_total, swap_accepts_total, loss_final(:), ...
+    'VariableNames', { ...
+        'Location','OuterIters','Converged','StopReason', ...
+        'TimeTotal_s','TimePermutation_s','TimeFitInit_s','TimeFitLoop_s','TimeFitTotal_s', ...
+        'PermFrac_pct','FitFrac_pct','SwapEvals','SwapAccepts','FinalLoss'});
+
+disp(ResultsRBFTime);
+writetable(ResultsRBFTime, 'time_efficiency_RBF.csv');
+
+
+fprintf('\n==== Alternating RBF: Time-Efficiency Summary ====\n');
+fprintf('Locations evaluated: %d\n', num_locations);
+fprintf('Convergence rate: %.1f%%\n', 100*mean(converged));
+
+fprintf('\n-- Total runtime per location (s) --\n');
+fprintf('Mean:   %.4f | Median: %.4f | 90%%: %.4f | Max: %.4f\n', ...
+    mean(t_total), median(t_total), prctile(t_total,90), max(t_total));
+
+fprintf('\n-- Permutation (swap-search) runtime --\n');
+fprintf('Mean:   %.4f | Median: %.4f | Mean fraction: %.1f%%\n', ...
+    mean(t_swap), median(t_swap), mean(swap_frac));
+
+fprintf('\n-- Parameter fitting runtime (fminsearch) --\n');
+fprintf('Mean:   %.4f | Median: %.4f | Mean fraction: %.1f%%\n', ...
+    mean(t_fit), median(t_fit), mean(fit_frac));
+
+fprintf('\n-- Outer iterations executed --\n');
+fprintf('Mean:   %.2f | Median: %.2f | 90%%: %.2f\n', ...
+    mean(iter_count), median(iter_count), prctile(iter_count,90));
+
+t_per_iter = t_total ./ max(iter_count,1);
+fprintf('\nMean time per executed outer iteration: %.4f s\n', mean(t_per_iter));
+
+
+
+% figure;
+% boxplot([t_total, t_swap, t_fit], 'Labels', {'Total','Permutation','Param fit'});
+% ylabel('Seconds');
+% title('Runtime Breakdown Across Locations');
+% grid on;
+
+
+figure;
+bar([swap_frac, fit_frac], 'stacked');
+xlabel('Location');
+ylabel('Percent of total runtime');
+title('Runtime Fraction: Swap vs Parameter Fitting');
+legend('Swap','Fit','Location','best');
+grid on;
+
+
+figure;
+histogram(iter_count);
+xlabel('Outer iterations executed');
+ylabel('Count');
+title('Iterations to Stop (Converged or Max Iter)');
+grid on;
+
+% % Runtime vs iterations (efficiency relationship)
+% figure;
+% scatter(iter_count, t_total, 'filled');
+% xlabel('Outer iterations executed');
+% ylabel('Total runtime (s)');
+% title('Total Runtime vs Iterations');
+% grid on;
+
+
+
+
+% for loc = 1:3
+%     lh = stats_store{loc}.loss_hist;   % if you store stats per location
+%     iters = 0:(numel(lh)-1);
+% 
+%     figure;
+%     plot(iters, lh, '-o', 'LineWidth', 2);
+%     xlabel('Outer iteration');
+%     ylabel('loss\_current (after refit)');
+%     title(sprintf('Loss vs Iteration (Location %d)', loc));
+%     grid on;
+% end
+
+
+maxLen = 0;
+for i = 1:num_locations
+    maxLen = max(maxLen, numel(stats_store{i}.loss_hist));
+end
+LH = nan(num_locations, maxLen);
+for i = 1:num_locations
+    lh = stats_store{i}.loss_hist;
+    LH(i,1:numel(lh)) = lh;
+end
+avg_lh = nanmean(LH, 1);
+iters = 0:(numel(avg_lh)-1);
+
+figure;
+plot(iters, avg_lh, '-o', 'LineWidth', 2);
+xlabel('Outer iteration');
+ylabel('Average loss\_current (after refit)');
+title('Average Loss vs Iteration (All Locations)');
+grid on;
+
+
+% for loc = 1:3
+%     lh = stats_store{loc}.loss_hist;          % length = outer_iters+1
+%     ls = stats_store{loc}.loss_swap_best;     % length = outer_iters
+%     iters = 0:(numel(lh)-1);
+% 
+%     figure;
+%     plot(iters, lh, '-o', 'LineWidth', 2); hold on;
+%     plot(1:numel(ls), ls, '--s', 'LineWidth', 2);
+%     xlabel('Outer iteration');
+%     ylabel('Loss');
+%     legend('After refit (loss\_hist)', 'Best during swaps (loss\_swap\_best)', 'Location','best');
+%     title(sprintf('Loss vs Iteration (Location %d)', loc));
+%     grid on; hold off;
+% end
+
+
+
+
+% ===================== Average curves across ALL locations =====================
+
+num_locations = numel(stats_store);
+
+% ---- 1) swap-only best (iter 1..K) ----
+maxLenS = 0;
+for i = 1:num_locations
+    if isfield(stats_store{i}, 'loss_swap_best')
+        maxLenS = max(maxLenS, numel(stats_store{i}.loss_swap_best));
+    end
+end
+LS = nan(num_locations, maxLenS);
+for i = 1:num_locations
+    if isfield(stats_store{i}, 'loss_swap_best')
+        ls = stats_store{i}.loss_swap_best;
+        LS(i,1:numel(ls)) = ls;
+    end
+end
+avg_ls = nanmean(LS, 1);
+iters_s = 1:numel(avg_ls);
+
+% ---- 2) refit-only (iter 1..K) ----
+maxLenR = 0;
+for i = 1:num_locations
+    if isfield(stats_store{i}, 'loss_refit_only')
+        maxLenR = max(maxLenR, numel(stats_store{i}.loss_refit_only));
+    end
+end
+LR = nan(num_locations, maxLenR);
+for i = 1:num_locations
+    if isfield(stats_store{i}, 'loss_refit_only')
+        lr = stats_store{i}.loss_refit_only;
+        LR(i,1:numel(lr)) = lr;
+    end
+end
+avg_lr = nanmean(LR, 1);
+iters_r = 1:numel(avg_lr);
+
+% ---- 3) swap + refit actual (loss_hist: iter 0..K) ----
+maxLenH = 0;
+for i = 1:num_locations
+    maxLenH = max(maxLenH, numel(stats_store{i}.loss_hist));
+end
+LH = nan(num_locations, maxLenH);
+for i = 1:num_locations
+    lh = stats_store{i}.loss_hist;
+    LH(i,1:numel(lh)) = lh;
+end
+avg_lh = nanmean(LH, 1);
+iters_h = 0:(numel(avg_lh)-1);
+
+% ---- Plot all three on one figure ----
+figure;
+plot(iters_s, avg_ls, '--s', 'LineWidth', 2); hold on;
+plot(iters_r, avg_lr, ':d',  'LineWidth', 2);
+plot(iters_h, avg_lh, '-o',  'LineWidth', 2);
+
+xlabel('Outer iteration');
+ylabel('Average Loss');
+legend('Best during swaps (swap-only)', ...
+       'Refit-only (no swaps)', ...
+       'After swap + refit (actual)', ...
+       'Location','best');
+title('Average Loss vs Iteration (All Locations)');
+grid on; hold off;
+
+
+% ---- Red rectangle (ZOOM REGION) ----
+% x_zoom = [6 10];
+% y_zoom = [2170 2440];
+x_zoom = [6 15];
+y_zoom = [2120 2440];
+
+rectangle('Position', [x_zoom(1), y_zoom(1), ...
+                       diff(x_zoom), diff(y_zoom)], ...
+          'EdgeColor','r', 'LineWidth',1);
+hold off;
+
+% ===== Create zoomed inset =====
+% ax_inset = [0.55 0.34 0.32 0.35];     % 10 iterations
+ax_inset = [0.47 0.34 0.4 0.35];        % [left bottom width height] [0.55 0.34 0.32 0.35];  
+axes('Position', ax_inset);  
+
+% Plot the same curves again
+hold on; grid on;
+
+plot(iters_s, avg_ls, '--s', 'LineWidth', 1.5);
+plot(iters_r, avg_lr, ':d',  'LineWidth', 1.5);
+plot(iters_h, avg_lh, '-o',  'LineWidth', 1.5);
+
+% ---- Set zoom region (adjust these!) ----
+xlim(x_zoom);          % iteration range (your red box region)          
+ylim(y_zoom);          % loss range (tight zoom)
+set(gca, 'FontSize', 7);
+
+hold off;
+
+% ---- Red border around inset ----
+annotation('rectangle', ax_inset, ...
+    'Color','r', 'LineWidth',1);
+
+% -----------------------------------------------------------
+
+
+
+
+
+
+
+% ===== 2x2 Figure: Time efficiency + convergence + loss curves =====
+
+figure('Position', [200 200 1100 850]);
+
+% Create 2x2 axes
+ax1 = subplot(2,2,1);   % stacked bar: swap vs fit fraction
+ax2 = subplot(2,2,2);   % histogram: iterations
+ax3 = subplot(2,2,3);   % average loss_hist only
+ax4 = subplot(2,2,4);   % 3-curve average loss (swap-only, refit-only, swap+refit)
+
+% Common formatting helper (optional inline)
+set([ax1 ax2 ax3 ax4], 'FontSize', 10, 'LineWidth', 1.0);
+
+% ---- (1) Runtime fraction: swap vs fit (stacked bar) ----
+axes(ax1);
+bar([swap_frac, fit_frac], 'stacked');
+xlabel('Location');
+ylabel('% of total runtime');
+title('Runtime Fraction: Swap vs Fit');
+legend('Swap','Fit','Location','best');
+grid on;
+
+% ---- (2) Histogram: iterations executed ----
+axes(ax2); 
+histogram(iter_count);
+ymax = max(ax2.Children.BinCounts);
+ylim(ax2, [0, 1.1*ymax]);
+xlabel('Outer iterations executed');
+ylabel('Count');
+title('Iterations to Stop');
+grid on;
+
+% ---- (3) Average loss after swap+refit only (loss_hist) ----
+axes(ax3);
+% Build avg_lh from loss_hist
+num_locations = numel(stats_store);
+
+maxLenH = 0;
+for i = 1:num_locations
+    maxLenH = max(maxLenH, numel(stats_store{i}.loss_hist));
+end
+
+LH = nan(num_locations, maxLenH);
+for i = 1:num_locations
+    lh = stats_store{i}.loss_hist;
+    LH(i,1:numel(lh)) = lh;
+end
+
+avg_lh_only = nanmean(LH, 1);
+iters_only  = 0:(numel(avg_lh_only)-1);
+
+plot(iters_only, avg_lh_only, '-o', 'LineWidth', 2);
+xlabel('Outer iteration');
+ylabel('Avg loss (after refit)');
+title('Avg Loss vs Iteration (swap+refit)');
+grid on;
+
+% ---- (4) Average three loss curves: swap-only, refit-only, swap+refit ----
+axes(ax4); 
+
+% ---- 1) swap-only best (iter 1..K) ----
+maxLenS = 0;
+for i = 1:num_locations
+    if isfield(stats_store{i}, 'loss_swap_best')
+        maxLenS = max(maxLenS, numel(stats_store{i}.loss_swap_best));
+    end
+end
+LS = nan(num_locations, maxLenS);
+for i = 1:num_locations
+    if isfield(stats_store{i}, 'loss_swap_best')
+        ls = stats_store{i}.loss_swap_best;
+        LS(i,1:numel(ls)) = ls;
+    end
+end
+avg_ls = nanmean(LS, 1);
+iters_s = 1:numel(avg_ls);
+
+% ---- 2) refit-only (iter 1..K) ----
+maxLenR = 0;
+for i = 1:num_locations
+    if isfield(stats_store{i}, 'loss_refit_only')
+        maxLenR = max(maxLenR, numel(stats_store{i}.loss_refit_only));
+    end
+end
+LR = nan(num_locations, maxLenR);
+for i = 1:num_locations
+    if isfield(stats_store{i}, 'loss_refit_only')
+        lr = stats_store{i}.loss_refit_only;
+        LR(i,1:numel(lr)) = lr;
+    end
+end
+avg_lr = nanmean(LR, 1);
+iters_r = 1:numel(avg_lr);
+
+% ---- 3) swap + refit actual (loss_hist: iter 0..K) ----
+% (reuse avg_lh_only computed above)
+avg_lh = avg_lh_only;
+iters_h = iters_only;
+
+hold on; grid on;
+if ~isempty(avg_ls)
+    plot(iters_s, avg_ls, '--s', 'LineWidth', 2);
+end
+if ~isempty(avg_lr) && any(~isnan(avg_lr))
+    plot(iters_r, avg_lr, ':d', 'LineWidth', 2);
+end
+plot(iters_h, avg_lh, '-o', 'LineWidth', 2);
+
+xlabel('Outer iteration');
+ylabel('Average loss');
+title('Avg Loss Decomposition');
+legendEntries = {};
+if ~isempty(avg_ls), legendEntries{end+1} = 'Swap-only (best during swaps)'; end
+if ~isempty(avg_lr) && any(~isnan(avg_lr)), legendEntries{end+1} = 'Refit-only (no swaps)'; end
+legendEntries{end+1} = 'Swap + refit (actual)';
+legend(legendEntries, 'Location','best');
+
+
+% ---- Red rectangle (ZOOM REGION) ----
+% x_zoom = [6 10];
+% y_zoom = [2170 2440];
+x_zoom = [6 15];
+y_zoom = [2120 2440];
+
+rectangle('Position', [x_zoom(1), y_zoom(1), ...
+                       diff(x_zoom), diff(y_zoom)], ...
+          'EdgeColor','r', 'LineWidth',1);
+hold off;
+
+% ===== Create zoomed inset =====
+% ax_inset = [0.76 0.2 0.135 0.15];      % 10 iterations
+ax_inset = [0.7 0.2 0.195 0.15];        % [left bottom width height] [0.58 0.35 0.3 0.35];  
+axes('Position', ax_inset);  
+
+% Plot the same curves again
+hold on; grid on;
+
+plot(iters_s, avg_ls, '--s', 'LineWidth', 1.5);
+plot(iters_r, avg_lr, ':d',  'LineWidth', 1.5);
+plot(iters_h, avg_lh, '-o',  'LineWidth', 1.5);
+
+% ---- Set zoom region (adjust these!) ----
+xlim(x_zoom);          % iteration range (your red box region)          
+ylim(y_zoom);          % loss range (tight zoom)
+set(gca, 'FontSize', 7);
+
+hold off;
+
+% ---- Red border around inset ----
+annotation('rectangle', ax_inset, ...
+    'Color','r', 'LineWidth',1);
+
+% sgtitle('RBF');
+% -----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

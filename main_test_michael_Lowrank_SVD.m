@@ -126,7 +126,7 @@ tic;
 
 
 %% --- Reuse saved selection/IDs instead of recomputing ---
-S = load('Bendersdecomposition_PETS_Qiu_SP/nyc_location_data_8000_nodes/location_data_sample_1/location_data_r4_user1.mat', ...
+S = load('Bendersdecomposition/nyc_location_data_2000_nodes/location_data_sample_1/location_data_r1_user1.mat', ...
          'lon_sel','lat_sel','node_tar','obf_ID');   % add 'LR_ID' if you need it later
 
 % Treat the saved selected set as your "original" set
@@ -138,7 +138,7 @@ num_points = min(200, numel(S.lon_sel));
 original_longitude  = S.lon_sel(1:num_points);
 original_latitude   = S.lat_sel(1:num_points);
 
-R = load('Bendersdecomposition_PETS_Qiu_SP/nyc_location_data_8000_nodes/location_data_sample_1/location_data_r4_user1.mat','LR_ID');
+R = load('Bendersdecomposition/nyc_location_data_2000_nodes/location_data_sample_1/location_data_r1_user1.mat','LR_ID');
 nearest_longitude = S.lon_sel(R.LR_ID);
 nearest_latitude  = S.lat_sel(R.LR_ID);
 
