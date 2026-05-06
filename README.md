@@ -115,16 +115,16 @@ From the root directory, run any of the test scripts to evaluate specific surrog
 
 ```matlab
 % Test 2D Gaussian parametric surrogates
-main_test_michael_Gaussian.m
+main_test_Gaussian.m
 
 % Test 2D polynomial parametric surrogates
-main_test_michael_Polynomial.m
+main_test_Polynomial.m
 
 % Test RBF parametric surrogates
-main_test_michael_RBF.m
+main_test_RBF.m
 
 % Test low-rank SVD surrogates (recommended for best privacy-accuracy tradeoff)
-main_test_michael_Lowrank_SVD.m
+main_test_Lowrank_SVD.m
 ```
 
 #### Configuring Experiments
@@ -355,16 +355,6 @@ lat = table2array(df_nodes(:, 'y'));
    - Use low-rank SVD (fewer parameters than parametric surrogates)
    - Increase rank r if RelErr is too high
 
-### Performance Tips
-
-- Use **low-rank SVD surrogates** for best privacy-accuracy tradeoff
-- Set **privacy budget epsilon conservatively** (larger values → smaller noise → lower utility loss but weaker privacy)
-- Enable **parallel computing** for subproblems with parpool:
-  ```matlab
-  parpool(12);  % Use 12 workers
-  % Subproblems will solve in parallel
-  ```
-- **Cache intermediate results** to avoid recomputation during parameter tuning
 
 ## Related Work & Baselines
 
