@@ -24,11 +24,11 @@ DistributedLP/
 ├── README.md                          # This file
 ├── parameters.m                       # Global parameter configuration
 ├── main.m                             # Example usage script
-├── main_test_*.m              # Test scripts for different surrogate families
-│   ├── main_test_Gaussian.m   # Tests 2D Gaussian parametric surrogates
-│   ├── main_test_Polynomial.m # Tests 2D polynomial parametric surrogates
-│   ├── main_test_RBF.m        # Tests RBF parametric surrogates
-│   └── main_test_Lowrank_SVD.m # Tests low-rank SVD surrogates
+├── main_test_*.m                      # Test scripts for different surrogate families
+│   ├── main_test_Gaussian.m           # Tests 2D Gaussian parametric surrogates
+│   ├── main_test_Polynomial.m         # Tests 2D polynomial parametric surrogates
+│   ├── main_test_RBF.m                # Tests RBF parametric surrogates
+│   └── main_test_Lowrank_SVD.m        # Tests low-rank SVD surrogates
 ├── Bendersdecomposition/              # Main DISTA-LP framework implementation
 │   ├── main.m                         # Primary experimental runner
 │   ├── parameters.m                   # Framework-specific parameters
@@ -378,57 +378,3 @@ lat = table2array(df_nodes(:, 'y'));
 - **RMP (Bayesian Remapping)**: Post-processing utility improvement 
 - **PAnDA**: Anchor-based distributed LP
 - **Coarse Grid LP**: Discretized LP on coarse spatial grid
-
-### Comparison
-See paper for detailed theoretical and empirical comparisons with recent mDP literature.
-
-## Ethical Considerations
-
-### Privacy & Safety
-
-- **Threat Model**: Honest-but-curious server (standard assumption)
-- **Differential Privacy Guarantee**: Formal end-to-end (ε, δ)-mDP certified via probabilistic auditing
-- **Safe Parameter Choices**: Recommend ε ≥ 4.0 km^-1 for meaningful privacy; smaller values provide stronger guarantees
-- **No Raw Data Release**: Code and artifacts contain only synthetic/derived results, not raw location data
-
-### Responsible Use
-
-Users should:
-1. **Choose metrics reflecting real-world threat models** (e.g., don't use excessive epsilon to weaken privacy)
-2. **Evaluate fairness implications** for marginalized or highly-surveilled populations
-3. **Document privacy assumptions** in system documentation
-4. **Monitor deployed systems** for unexpected utility-privacy tradeoff degradation
-
-See paper's "Ethical Considerations" section for fuller discussion.
-
-## Citation
-
-If you use this code or framework in research, please cite:
-
-```bibtex
-@article{DISTA-LP,
-  title={DISTA-LP: Privacy-Preserving Distributed Linear Programming for Metric Differential Privacy},
-  author={[Authors]},
-  year={2025},
-  note={Preprint available}
-}
-```
-
-## License
-
-[Specify license here, e.g., MIT, Apache 2.0, or CC-BY]
-
-## Contact & Support
-
-For questions or issues:
-- **Paper Correspondence**: [Contact email]
-- **Code Issues**: [Repository Issues URL or contact]
-- **General Inquiries**: [Contact information]
-
----
-
-## Acknowledgments
-
-- **Datasets**: OpenStreetMap contributors and project
-- **Baselines**: Implementation inspired by referenced works (see Related Work)
-- **Funding**: [Acknowledge any funding sources]
