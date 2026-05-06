@@ -22,15 +22,13 @@ DISTA-LP addresses a critical challenge in distributed privacy-preserving system
 ```
 DistributedLP/
 ├── README.md                          # This file
-├── README_format.md                   # Documentation template
-├── _new__data_privacy__distributed_LP.pdf  # Paper PDF
 ├── parameters.m                       # Global parameter configuration
 ├── main.m                             # Example usage script
-├── main_test_michael_*.m              # Test scripts for different surrogate families
-│   ├── main_test_michael_Gaussian.m   # Tests 2D Gaussian parametric surrogates
-│   ├── main_test_michael_Polynomial.m # Tests 2D polynomial parametric surrogates
-│   ├── main_test_michael_RBF.m        # Tests RBF parametric surrogates
-│   └── main_test_michael_Lowrank_SVD.m # Tests low-rank SVD surrogates
+├── main_test_*.m              # Test scripts for different surrogate families
+│   ├── main_test_Gaussian.m   # Tests 2D Gaussian parametric surrogates
+│   ├── main_test_Polynomial.m # Tests 2D polynomial parametric surrogates
+│   ├── main_test_RBF.m        # Tests RBF parametric surrogates
+│   └── main_test_Lowrank_SVD.m # Tests low-rank SVD surrogates
 ├── Bendersdecomposition/              # Main DISTA-LP framework implementation
 │   ├── main.m                         # Primary experimental runner
 │   ├── parameters.m                   # Framework-specific parameters
