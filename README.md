@@ -45,10 +45,6 @@ DistributedLP/
 │   │   ├── read_files/                # Dataset I/O utilities
 │   │   └── haversine/                 # Haversine distance calculations
 │   ├── dataset/                       # Dataset configuration
-│   ├── datasets/                      # Processed road-network data files
-│   │   ├── rome_*.csv                 # Rome OSM road network (nodes, edges)
-│   │   ├── london_*.csv               # London OSM road network
-│   │   └── nyc_*.csv                  # New York City OSM road network
 │   ├── rome_location_data_*/          # Preprocessed Rome location subsets (2K-10K nodes)
 │   ├── london_location_data_*/        # Preprocessed London location subsets
 │   ├── nyc_location_data_*/           # Preprocessed NYC location subsets
