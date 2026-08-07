@@ -51,7 +51,8 @@ DistributedLP/
 │   ├── rome_baseline_results/         # Rome experimental results
 │   ├── london_baseline_results/       # London experimental results
 │   ├── nyc_baseline_results/          # NYC experimental results
-│   └── results/                       # Output directory for latest experiments
+│   ├── results/                       # Output directory for latest experiments
+│   └── additional_experiment_results/ # Output directory for additional experiments during review 
 ├── functions/                         # Legacy/utility functions
 ├── figure_tools/                      # Visualization helpers
 ├── datasets/                          # Additional dataset resources

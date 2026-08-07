@@ -121,11 +121,11 @@ parameters;
 
 Regions = [ ...
  %% ROME DATASET (FOR 2000 NODES)
- % struct('lon_min',12.2,'lon_max',12.4,'lat_min',41.901,'lat_max',42.10)
- % struct('lon_min',12.2,'lon_max',12.4,'lat_min',41.701,'lat_max',41.90)
- % struct('lon_min',12.401,'lon_max',12.6,'lat_min',41.901,'lat_max',42.10)
- % struct('lon_min',12.401,'lon_max',12.6,'lat_min',41.701,'lat_max',41.90)
- % struct('lon_min',12.601,'lon_max',12.8,'lat_min',41.801,'lat_max',42.00) ];      
+ struct('lon_min',12.2,'lon_max',12.4,'lat_min',41.901,'lat_max',42.10)
+ struct('lon_min',12.2,'lon_max',12.4,'lat_min',41.701,'lat_max',41.90)
+ struct('lon_min',12.401,'lon_max',12.6,'lat_min',41.901,'lat_max',42.10)
+ struct('lon_min',12.401,'lon_max',12.6,'lat_min',41.701,'lat_max',41.90)
+ struct('lon_min',12.601,'lon_max',12.8,'lat_min',41.801,'lat_max',42.00) ];      
 
  %% ROME DATASET (4000 $ 6000 NODES)
  % struct('lon_min',12.2,'lon_max',12.4,'lat_min',41.701,'lat_max',42.10)
@@ -134,9 +134,9 @@ Regions = [ ...
  % struct('lon_min',12.5901,'lon_max',12.8,'lat_min',41.801,'lat_max',42.00) ];
 
  %% ROME DATASET (8000 $ 10000 NODES)
- struct('lon_min',12.2,'lon_max',12.45,'lat_min',41.701,'lat_max',42.10)
- struct('lon_min',12.4501,'lon_max',12.55,'lat_min',41.701,'lat_max',42.10)
- struct('lon_min',12.5501,'lon_max',12.8,'lat_min',41.7501,'lat_max',42.00) ];
+ % struct('lon_min',12.2,'lon_max',12.45,'lat_min',41.701,'lat_max',42.10)
+ % struct('lon_min',12.4501,'lon_max',12.55,'lat_min',41.701,'lat_max',42.10)
+ % struct('lon_min',12.5501,'lon_max',12.8,'lat_min',41.7501,'lat_max',42.00) ];
 
 
  %% NYC DATASET (2000, 4000 $ 6000 NODES)
@@ -225,7 +225,7 @@ for r =  1:R
 
     env_parameters.nr_loc_selected = 500; 
    
-    env_parameters.nr_loc_selected = NR_LOC*8000; 
+    env_parameters.nr_loc_selected = NR_LOC*2000; 
     
     
     %% Initialization

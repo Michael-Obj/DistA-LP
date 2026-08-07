@@ -1,0 +1,18 @@
+function agent = creatGeoI(agent, distance_matrix, obf_loc, NR_LOC_IN_TARGET, NR_OBFLOC, EPSILON)
+    distance_matrix = full(distance_matrix); 
+    idx = 0; 
+
+    NR_LOC_IN_AGENT = size(agent.node, 2); 
+    GeoI_matrix = sparse(1, NR_LOC_IN_AGENT*NR_OBFLOC);
+    for i = 1:1:size(agent.intraset, 1)
+        % GeoI_matrix(idx+1:idx+NR_OBFLOC, (agent.intraset(i,1)-1)*NR_OBFLOC*ones(NR_OBFLOC, 1) + eye(NR_OBFLOC)) = 1;
+        % GeoI_matrix(idx+1:idx+NR_OBFLOC, (agent.intraset(1,2)-1)*NR_OBFLOC*ones(NR_OBFLOC, 1) + eye(NR_OBFLOC)) ... 
+        %     = -exp(EPSILON*distance_matrix(agent.intraset(i,1), agent.intraset(i,2)));
+        %     idx = idx + NR_OBFLOC;
+        for k = 1:1:
+        GeoI_matrix(idx+1:idx+NR_OBFLOC, (agent.intraset(i,1)-1)*NR_OBFLOC*ones(NR_OBFLOC, 1) + eye(NR_OBFLOC)) = 1;
+        GeoI_matrix(idx+1:idx+NR_OBFLOC, (agent.intraset(1,2)-1)*NR_OBFLOC*ones(NR_OBFLOC, 1) + eye(NR_OBFLOC)) ... 
+            = -exp(EPSILON*distance_matrix(agent.intraset(i,1), agent.intraset(i,2)));
+            idx = idx + NR_OBFLOC;
+    end
+end

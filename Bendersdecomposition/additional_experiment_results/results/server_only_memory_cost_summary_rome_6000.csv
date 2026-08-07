@@ -1,0 +1,4 @@
+epsilon_index,epsilon_total,successful_regions,mean_server_runtime_sec,std_server_runtime_sec,min_server_runtime_sec,median_server_runtime_sec,max_server_runtime_sec,mean_server_mem_delta_mb_nonnegative,std_server_mem_delta_mb_nonnegative,mean_server_mem_delta_mb,std_server_mem_delta_mb,min_server_mem_delta_mb,median_server_mem_delta_mb,max_server_mem_delta_mb,mean_nr_iterations,std_nr_iterations
+1,10,4,5.6007468,0.0393095689565953,5.5683076,5.5915638,5.651552,0.0009765625,0.001953125,0.0009765625,0.001953125,0,0,0.00390625,2,0
+2,7,4,5.522026625,0.140693897973849,5.4282115,5.4656336,5.7286278,0.0104166666666667,0.0180421959121758,-0.1181640625,0.257583053675927,-0.50390625,0,0.03125,2,0
+3,4,4,5.564057575,0.0605150849532233,5.496308,5.5588795,5.6421633,0.017578125,0.0301735162142096,0.017578125,0.0301735162142096,0,0.00390625,0.0625,2,0

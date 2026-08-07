@@ -1,0 +1,17 @@
+function masteragent = creatMasterGeoI(masteragent, adjacent_matrix_interset, distance_matrix, NR_OBFLOC, EPSILON)
+    idx = 0;
+    NR_NODE_INTERSET = size(masteragent.node_interset, 2); 
+    [row,col] = find(masteragent.adjacent_matrix_interset > 0);
+    masteragent.GeoI = sparse(size(row, 1)*NR_OBFLOC, NR_NODE_INTERSET*NR_OBFLOC); 
+    for i = 1:1:size(row, 1)
+        i
+        node_i = find(masteragent.node_interset == row(i,1)); 
+        node_j = find(masteragent.node_interset == col(i,1)); 
+        [node_i node_j distance_matrix(row(i,1), col(i,1))]
+        for k = 1:1:NR_OBFLOC
+            masteragent.GeoI(idx+1, (node_i-1)*NR_OBFLOC + k) = 1;
+            masteragent.GeoI(idx+1, (node_j-1)*NR_OBFLOC + k) = -exp(EPSILON*distance_matrix(row(i,1), col(i,1)));
+            idx = idx + 1;
+        end
+    end
+end

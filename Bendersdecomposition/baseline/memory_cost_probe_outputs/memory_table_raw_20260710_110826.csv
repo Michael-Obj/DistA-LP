@@ -1,0 +1,22 @@
+city,node_count,user_id,repeat_id,epsilon,method,status,memory_cost_bytes,runtime_sec,detail
+london,2000,1,1,4,EM,ok,640000,37.4597417,loss=6756.4081; time_EM=0.003624; mem_delta=60788736; major_bytes=640000
+london,2000,1,1,4,Laplace,ok,640000,0.1057901,loss=3.5982537; time_laplace=0.01951; mem_delta=5410816; major_bytes=640000
+london,2000,1,1,4,RMP,ok,976488,0.0496698,loss=6367.5386; mem_delta=0; major_bytes=976488
+london,2000,1,1,4,LP,estimated_infeasible,25587200000000,NaN,Dense full-LP A estimate only: rows=7.996e+07; cols=40000; bytes=2.55872e+13
+london,2000,1,1,4,LP-A,estimated,522720000,NaN,LP-A coarse dense A estimate only: coarse_records=55; obf=20; rows=59400; cols=1100; bytes=5.2272e+08
+london,2000,1,1,4,COPT,not_available,NaN,NaN,COPT implementation is not present in the provided baseline folder
+london,2000,1,1,7,EM,ok,640000,36.6176543,loss=6494.8336; time_EM=0.001318; mem_delta=987136; major_bytes=640000
+london,2000,1,1,7,Laplace,ok,640000,0.0034826,loss=3.5951913; time_laplace=0.0009001; mem_delta=36864; major_bytes=640000
+london,2000,1,1,7,RMP,ok,976488,0.0291456,loss=6268.909; mem_delta=0; major_bytes=976488
+london,2000,1,1,7,LP,estimated_infeasible,25587200000000,NaN,Dense full-LP A estimate only: rows=7.996e+07; cols=40000; bytes=2.55872e+13
+london,2000,1,1,7,LP-A,estimated,522720000,NaN,LP-A coarse dense A estimate only: coarse_records=55; obf=20; rows=59400; cols=1100; bytes=5.2272e+08
+london,2000,1,1,7,COPT,not_available,NaN,NaN,COPT implementation is not present in the provided baseline folder
+london,2000,1,1,10,EM,ok,640000,36.3832598,loss=6361.6609; time_EM=0.001258; mem_delta=-147456; major_bytes=640000
+london,2000,1,1,10,Laplace,ok,640000,0.0025586,loss=3.5924587; time_laplace=0.001082; mem_delta=32768; major_bytes=640000
+london,2000,1,1,10,RMP,ok,976488,0.0284499,loss=6185.0901; mem_delta=0; major_bytes=976488
+london,2000,1,1,10,LP,estimated_infeasible,25587200000000,NaN,Dense full-LP A estimate only: rows=7.996e+07; cols=40000; bytes=2.55872e+13
+london,2000,1,1,10,LP-A,estimated,522720000,NaN,LP-A coarse dense A estimate only: coarse_records=55; obf=20; rows=59400; cols=1100; bytes=5.2272e+08
+london,2000,1,1,10,COPT,not_available,NaN,NaN,COPT implementation is not present in the provided baseline folder
+london,2000,1,1,4,PAnDA,ok,317693952,42.9622521,PAnDA runs epsilon 4/7/10 in one script; runtime=42.96; mem_delta=317693952; selected_bytes=128447555
+london,2000,1,1,7,PAnDA,ok,317693952,42.9622521,PAnDA runs epsilon 4/7/10 in one script; runtime=42.96; mem_delta=317693952; selected_bytes=128447555
+london,2000,1,1,10,PAnDA,ok,317693952,42.9622521,PAnDA runs epsilon 4/7/10 in one script; runtime=42.96; mem_delta=317693952; selected_bytes=128447555

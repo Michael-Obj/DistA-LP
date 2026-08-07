@@ -1,0 +1,22 @@
+\begin{table*}[t]
+\centering
+\caption{Memory cost across different baseline perturbation methods. Mean$\pm$1.96$\times$standard error; unavailable results are labeled by ``---'.}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ll|ccc|ccc|ccc}
+\hline
+\multicolumn{2}{c|}{Number of records} & \multicolumn{3}{c|}{2,000} & \multicolumn{3}{c|}{4,000} & \multicolumn{3}{c}{6,000} \\
+\multicolumn{2}{c|}{Privacy budget (km$^{-1}$)} & $\epsilon=4.0$ & $\epsilon=7.0$ & $\epsilon=10.0$ & $\epsilon=4.0$ & $\epsilon=7.0$ & $\epsilon=10.0$ & $\epsilon=4.0$ & $\epsilon=7.0$ & $\epsilon=10.0$ \\
+\hline
+\multicolumn{11}{c}{London road map} \\
+\hline
+Pre-defined Noise Distribution & EM & 640.00 KB & 640.00 KB & 640.00 KB & --- & --- & --- & --- & --- & --- \\
+Pre-defined Noise Distribution & Laplace & 640.00 KB & 640.00 KB & 640.00 KB & --- & --- & --- & --- & --- & --- \\
+Hybrid Method & RMP & 976.49 KB & 976.49 KB & 976.49 KB & --- & --- & --- & --- & --- & --- \\
+Hybrid Method & COPT & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+Optimization Based Methods & LP & 25.6 TB & 25.6 TB & 25.6 TB & --- & --- & --- & --- & --- & --- \\
+Optimization Based Methods & LP-A & 522.72 MB & 522.72 MB & 522.72 MB & --- & --- & --- & --- & --- & --- \\
+Optimization Based Methods & PAnDA & 317.69 MB & 317.69 MB & 317.69 MB & --- & --- & --- & --- & --- & --- \\
+\hline
+\end{tabular}%
+}
+\end{table*}

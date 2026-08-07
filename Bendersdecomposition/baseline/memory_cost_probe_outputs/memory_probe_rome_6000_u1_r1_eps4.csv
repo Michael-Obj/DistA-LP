@@ -1,0 +1,5 @@
+timestamp,stage,city,node_count,user_id,repeat_id,epsilon,runtime_sec,value1,value2,method_bytes,matlab_mem_used_bytes,matlab_mem_available_all_arrays_bytes,matlab_max_possible_array_bytes,physical_mem_available_bytes,physical_mem_total_bytes,detail
+2026-07-09 23:08:57,after_load,rome,6000,1,1,4,NaN,NaN,NaN,NaN,2140987392,11893796864,11893796864,17912569856,68424036352,loaded inputs
+2026-07-09 23:08:58,after_distance_matrix,rome,6000,1,1,4,NaN,NaN,NaN,NaN,2432512000,11691479040,11691479040,17656557568,68424036352,full target distance matrix built
+2026-07-09 23:08:58,before_lpca,rome,6000,1,1,4,NaN,NaN,NaN,392000000,2432512000,11686617088,11686617088,17656594432,68424036352,LPCA dense A estimate: NR_RECORD=50; NR_OBF=20; A_rows=49000; A_cols=1000; A_bytes=3.92e+08
+2026-07-09 23:08:58,full_lp_estimate_only,rome,6000,1,1,4,NaN,NaN,NaN,691084800000000,2432512000,11706957824,11706957824,17671634944,68424036352,Full dense LP A estimate: NR_RECORD=6000; NR_OBF=20; A_rows=7.1988e+08; A_cols=120000; A_bytes=6.91085e+14

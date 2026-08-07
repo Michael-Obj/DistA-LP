@@ -1,0 +1,7 @@
+timestamp,stage,city,node_count,user_id,repeat_id,epsilon,runtime_sec,value1,value2,method_bytes,matlab_mem_used_bytes,matlab_mem_available_all_arrays_bytes,matlab_max_possible_array_bytes,physical_mem_available_bytes,physical_mem_total_bytes,detail
+2026-07-09 23:06:17,after_load,london,2000,1,1,4,NaN,NaN,NaN,NaN,2453557248,13348659200,13348659200,19061030912,68424036352,loaded inputs
+2026-07-09 23:06:17,after_distance_matrix,london,2000,1,1,4,NaN,NaN,NaN,NaN,2486730752,13307478016,13307478016,19015151616,68424036352,full target distance matrix built
+2026-07-09 23:06:59,after_em_embr,london,2000,1,1,4,42.1725259,6756.40805075472,6367.53857056684,320000,2538270720,13209391104,13209391104,18885529600,68424036352,loss_EM=6756.4081; loss_EMBR=6367.5386; time_EM=0.01969; time_BR=0.05264; P_matrix_bytes=320000
+2026-07-09 23:06:59,before_lpca,london,2000,1,1,4,NaN,NaN,NaN,522720000,2539319296,13207494656,13207494656,18887397376,68424036352,LPCA dense A estimate: NR_RECORD=55; NR_OBF=20; A_rows=59400; A_cols=1100; A_bytes=5.2272e+08
+2026-07-09 23:06:59,full_lp_estimate_only,london,2000,1,1,4,NaN,NaN,NaN,25587200000000,2539319296,13215346688,13215346688,18890207232,68424036352,Full dense LP A estimate: NR_RECORD=2000; NR_OBF=20; A_rows=7.996e+07; A_cols=40000; A_bytes=2.55872e+13
+2026-07-09 23:07:48,after_lpca,london,2000,1,1,4,48.4793139,6328.62599479652,NaN,522720000,3230330880,11818786816,11818786816,17536892928,68424036352,loss_coarse=6328.626; time_LPCA=47.86; vio_ratio=0.5497255; A_bytes=522720000

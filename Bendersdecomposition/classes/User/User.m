@@ -110,21 +110,20 @@ classdef User
             % this = this.cost_matrix_cal(env_parameters);                    % Calculate the cost matrix
 
             %% Matrix approximation 
-            this = this.gaussian_fit(env_parameters);                       % Calculate the 2D gaussian fit, ??Michael
+            % this = this.gaussian_fit(env_parameters);                       % Calculate the 2D gaussian fit, ??Michael
             % this = this.polynomial_fit(env_parameters);                     % Calculate the 2D polynomial fit, ??Michael
             % this = this.RBF_fit(env_parameters);                            % Calculate the RBF fit, ??Michael
-            % this = this.lowrank_SVD_fit(env_parameters);                    % Calculate the Low Rank SVD fit, ??Michael    
+            this = this.lowrank_SVD_fit(env_parameters);                    % Calculate the Low Rank SVD fit, ??Michael    
 
-
-            this = this.gaussian_noisy_parameters(env_parameters);                   % Calculate noisy parameters, ??Michael 
+            % this = this.gaussian_noisy_parameters(env_parameters);                   % Calculate noisy parameters, ??Michael 
             % this = this.polynomial_noisy_parameters(env_parameters); 
             % this = this.RBF_noisy_parameters(env_parameters); 
-            % this = this.lowrank_SVD_noisy_parameters(env_parameters); 
+            this = this.lowrank_SVD_noisy_parameters(env_parameters); 
 
-            this = gaussian_recover(this, env_parameters); 
+            % this = gaussian_recover(this, env_parameters); 
             % this = polynomial_recover(this, env_parameters);
             % this = RBF_recover(this, env_parameters);
-            % this = lowrank_SVD_recover(this, env_parameters);
+            this = lowrank_SVD_recover(this, env_parameters);
 
             this.distance_matrix_LR_test = this.distance_matrix_LR;
             this.distance_matrix_LR2all_test = this.distance_matrix_LR2all;

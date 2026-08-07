@@ -1,0 +1,27 @@
+city,group,method,2000_eps4,2000_eps7,2000_eps10,4000_eps4,4000_eps7,4000_eps10,6000_eps4,6000_eps7,6000_eps10
+Rome road map,Pre-defined Noise Distribution,EM,0.64 MB,0.64 MB,0.64 MB,1.28 MB,1.28 MB,1.28 MB,1.92 MB,1.92 MB,1.92 MB
+Rome road map,Pre-defined Noise Distribution,Laplace,0.96 MB,0.96 MB,0.96 MB,1.92 MB,1.92 MB,1.92 MB,2.88 MB,2.88 MB,2.88 MB
+Rome road map,Hybrid Method,RMP,0.96 MB,0.96 MB,0.96 MB,1.92 MB,1.92 MB,1.92 MB,2.88 MB,2.88 MB,2.88 MB
+Rome road map,Hybrid Method,COPT,---,---,---,---,---,---,---,---,---
+Rome road map,Optimization Based Methods,LP,>25.6 TB,>25.6 TB,>25.6 TB,>204.7 TB,>204.7 TB,>204.7 TB,>691.1 TB,>691.1 TB,>691.1 TB
+Rome road map,Optimization Based Methods,LP-A,392.00 MB,392.00 MB,392.00 MB,392.00 MB,392.00 MB,392.00 MB,392.00 MB,392.00 MB,392.00 MB
+Rome road map,Optimization Based Methods,PAnDA,232.39 MB,232.39 MB,232.39 MB,933.56 MB,933.56 MB,933.56 MB,2313.32 MB,2313.32 MB,2313.32 MB
+Rome road map,Optimization Based Methods,DistA-LP,1.0375 MB,7.7995 MB ,14.5797 MB ,1.4009 MB,6.6318 MB ,19.645 MB ,1.6471 MB,8.4639 MB,25.6275 MB
+,,,,,,,,,,,
+London road map,Pre-defined Noise Distribution,EM,0.64 MB,0.64 MB,0.64 MB,1.28 MB,1.28 MB,1.28 MB,1.92 MB,1.92 MB,1.92 MB
+London road map,Pre-defined Noise Distribution,Laplace,0.96 MB,0.96 MB,0.96 MB,1.92 MB,1.92 MB,1.92 MB,2.88 MB,2.88 MB,2.88 MB
+London road map,Hybrid Method,RMP,0.96 MB,0.96 MB,0.96 MB,1.92 MB,1.92 MB,1.92 MB,2.88 MB,2.88 MB,2.88 MB
+London road map,Hybrid Method,COPT,---,---,---,---,---,---,---,---,---
+London road map,Optimization Based Methods,LP,>25.6 TB,>25.6 TB,>25.6 TB,>204.7 TB,>204.7 TB,>204.7 TB,>691.1 TB,>691.1 TB,>691.1 TB
+London road map,Optimization Based Methods,LP-A,522.72 MB,522.72 MB,522.72 MB,522.72 MB,522.72 MB,522.72 MB,522.72 MB,522.72 MB,522.72 MB
+London road map,Optimization Based Methods,PAnDA,401.42 MB,401.42 MB,401.42 MB,923.15 MB,923.15 MB,923.15 MB,2309.97 MB,2309.97 MB,2309.97 MB
+London road map,Optimization Based Methods,DistA-LP,1.7227 MB,7.8758 MB,22.355 MB,2.3711 MB,8.7055MB,22.77 MB,2.7703 MB,11.913 MB,23.616 MB
+,,,,,,,,,,,
+New York City road map,Pre-defined Noise Distribution,EM,0.64 MB,0.64 MB,0.64 MB,1.28 MB,1.28 MB,1.28 MB,1.92 MB,1.92 MB,1.92 MB
+New York City road map,Pre-defined Noise Distribution,Laplace,0.96 MB,0.96 MB,0.96 MB,1.92 MB,1.92 MB,1.92 MB,2.88 MB,2.88 MB,2.88 MB
+New York City road map,Hybrid Method,RMP,0.96 MB,0.96 MB,0.96 MB,1.92 MB,1.92 MB,1.92 MB,2.88 MB,2.88 MB,2.88 MB
+New York City road map,Hybrid Method,COPT,---,---,---,---,---,---,---,---,---
+New York City road map,Optimization Based Methods,LP,>25.6 TB,>25.6 TB,>25.6 TB,>204.7 TB,>204.7 TB,>204.7 TB,>691.1 TB,>691.1 TB,>691.1 TB
+New York City road map,Optimization Based Methods,LP-A,184.95 MB,184.95 MB,184.95 MB,184.95 MB,184.95 MB,184.95 MB,184.95 MB,184.95 MB,184.95 MB
+New York City road map,Optimization Based Methods,PAnDA,229.57 MB,229.57 MB,229.57 MB,922.61 MB,922.61 MB,922.61 MB,2312.96 MB,2312.96 MB,2312.96 MB
+New York City road map,Optimization Based Methods,DistA-LP,1.5049 MB,4.0234 MB,16.244 MB,1.6511 MB ,5.335 MB,20.137 MB,6.4273 MB,11.796 MB,23.774 MB

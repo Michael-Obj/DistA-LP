@@ -9,21 +9,27 @@ function env_parameters = readCityMapInfo(env_parameters)
     env_parameters.G                    = [];
     env_parameters.G_mDP                = [];
     
-    % opts = detectImportOptions('./dataset/city/nodes_rome.csv');
-    % opts = setvartype(opts, 'osmid', 'int64');
-    % df_nodes = readtable('./dataset/city/nodes_rome.csv', opts);
-    % df_edges = readtable('./dataset/city/edges_rome.csv');
 
+    % ROME DATASET
+    opts = detectImportOptions('./dataset/city/nodes_rome.csv');
+    opts = setvartype(opts, 'osmid', 'int64');
+    df_nodes = readtable('./dataset/city/nodes_rome.csv', opts);
+    df_edges = readtable('./dataset/city/edges_rome.csv');
+
+    % % NEW YORK CITY (NYC) DATASET
     % opts = detectImportOptions('./dataset/city/nodes_nyc.csv');
     % opts = setvartype(opts, 'osmid', 'int64');
     % df_nodes = readtable('./dataset/city/nodes_nyc.csv', opts);
     % df_edges = readtable('./dataset/city/edges_nyc.csv');
-
-    opts = detectImportOptions('./dataset/city/nodes_london.csv');
-    opts = setvartype(opts, 'osmid', 'int64');
-    df_nodes = readtable('./dataset/city/nodes_london.csv', opts);
-    df_edges = readtable('./dataset/city/edges_london.csv');
-                                                                            % Extract the column as an array
+    
+    % % LONDON DATASET
+    % opts = detectImportOptions('./dataset/city/nodes_london.csv');
+    % opts = setvartype(opts, 'osmid', 'int64');
+    % df_nodes = readtable('./dataset/city/nodes_london.csv', opts);
+    % df_edges = readtable('./dataset/city/edges_london.csv');
+    
+    
+    % Extract the column as an array
     env_parameters.longitude_raw = table2array(df_nodes(:, 'x'));                              % Actual x (longitude) coordinate from the nodes data
     env_parameters.latitude_raw = table2array(df_nodes(:, 'y'));                               % Actual y (latitude) coordinate from the nodes data
     env_parameters.osmid = table2array(df_nodes(:, 'osmid'));

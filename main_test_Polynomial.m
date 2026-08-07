@@ -260,10 +260,8 @@ for i = 1:num_locations
     raw_distance_matrix_unaligned = compute_distance_matrix([original_latitude(i); nearest_latitude], ...
                                                                 [original_longitude(i); nearest_longitude]);
 
-
     % Store the aligned distance matrix in the cell array
     original_distance_matrices{i} = raw_distance_matrix_unaligned;
-
 
     % Display Results
     fprintf('Results for Location %d:\n', i);
@@ -284,17 +282,14 @@ for i = 1:num_locations
     % Select the 9 nearest neighbors for the current location
     % [nearest_longitude, nearest_latitude] = select_nearest_neighbors(original_longitude, original_latitude, i, CARDINALITY_N - 1);
 
-
     % Compute the raw distance matrix before alignment
     raw_distance_matrix_unaligned = compute_raw_distance_matrix([original_longitude(i); nearest_longitude], ...
                                                                 [original_latitude(i); nearest_latitude], ...
                                                                 obfuscated_longitude, ...
                                                                 obfuscated_latitude);
 
-    
     % Store the aligned distance matrix in the cell array
     obfuscated_distance_matrices{i} = raw_distance_matrix_unaligned;
-
 
     % Display Results
     fprintf('Results for Location %d:\n', i);
@@ -323,10 +318,8 @@ for i = 1:num_locations
                                                             df_edges, ...
                                                             df_nodes);
 
-
     % Store the aligned distance matrix in the cell array
     cost_distance_matrix_original{i} = raw_distance_matrix_original_unaligned;
-
 
     % Display Results
     fprintf('Results for Location %d:\n', i);

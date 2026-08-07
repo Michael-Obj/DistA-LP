@@ -1,0 +1,74 @@
+function [masteragent, lowerbound, upperbound] = bendersDecomposition(masteragent, agent, cost_matrix, NR_OBFLOC, NR_AGENT, NR_NODE_IN_TARGET, NR_NODE_INTERSET, ITER)
+    upperbound_ = []; 
+    iter = 1; 
+    while iter <= ITER
+        iter
+        Z = zeros(NR_NODE_IN_TARGET, NR_OBFLOC); 
+        % Master program calculates the inter set decision variables
+        if iter == 0
+            Z = ones(NR_NODE_IN_TARGET, NR_OBFLOC)/NR_OBFLOC; 
+            lowerbound(iter) = 0; %1/20*sum(sum(cost_matrix)); 
+        else
+            [masteragent, agent, lowerbound(iter), is_cut] = masterProblem2(masteragent, agent, cost_matrix, NR_OBFLOC, NR_AGENT); 
+            Z(masteragent.node, :) = masteragent.decision;
+        end
+        new_cut_A_ = []; 
+        new_cut_b_ = []; 
+        
+    
+        for i = 1:1:NR_AGENT       
+            if size(agent(i).node_intraset  , 2)*size(agent(i).node_intraset, 1) > 0
+                agent(i) = subProblem(agent(i), cost_matrix, NR_OBFLOC, Z);
+                upperbound_(iter, i) = agent(i).upperbound; 
+                isunbounded(i) = agent(i).isunbounded; 
+            end
+        end
+        % if iter == 1
+             upperbound(iter) = sum(upperbound_(iter, :)); 
+        % else
+        %    upperbound(iter) = min([sum(upperbound_(iter, :)), upperbound(iter-1)]); 
+        %    upperbound(iter) = sum(upperbound_(iter, :));
+        % end
+        Z = integrateZ(agent, NR_NODE_IN_TARGET, NR_OBFLOC); 
+    
+    
+        for i = 1:1:NR_AGENT 
+            new_cut_A__ = sparse(1, NR_NODE_INTERSET*NR_OBFLOC+NR_AGENT);
+            if agent(i).isunbounded == 1  
+                for j = 1:1:size(agent(i).node_interset, 2)
+                    node_j = find(node_interset == agent(i).node_interset(j)); 
+                    for k = 1:1:NR_OBFLOC
+                        new_cut_A__(1, (node_j-1)*NR_OBFLOC+k) = agent(i).new_cut_A_unbounded(1, (j-1)*NR_OBFLOC+k); 
+                    end
+                end
+                new_cut_A_ = [new_cut_A_; new_cut_A__];
+                new_cut_b_ = [new_cut_b_; agent(i).new_cut_b_unbounded];    
+            else
+                if agent(i).isupdated == 1
+                    if size(agent(i).node_interset, 1) * size(agent(i).node_interset, 2) > 0
+                        for j = 1:1:size(agent(i).node_interset, 2)
+                            node_j = find(node_interset == agent(i).node_interset(j)); 
+                            for k = 1:1:NR_OBFLOC
+                                new_cut_A__(1, (node_j-1)*NR_OBFLOC+k) = agent(i).new_cut_A_bounded(1, (j-1)*NR_OBFLOC+k); 
+                            end
+                        end
+                        new_cut_A__(1, NR_NODE_INTERSET*NR_OBFLOC+i) = -1; 
+                        new_cut_A_ = [new_cut_A_; new_cut_A__];
+                        new_cut_b_ = [new_cut_b_; agent(i).new_cut_b_bounded];  
+                    else
+                        new_cut_A__(1, NR_NODE_INTERSET*NR_OBFLOC+i) = -1; 
+                        new_cut_A_ = [new_cut_A_; new_cut_A__];
+                        new_cut_b_ = [new_cut_b_; agent(i).new_cut_b_bounded]; 
+                    end
+                end
+           end   
+        end
+    
+        masteragent.cuts_A = [masteragent.cuts_A; new_cut_A_]; 
+        masteragent.cuts_b = [masteragent.cuts_b; new_cut_b_]; 
+        % if upperbound(iter) - lowerbound(iter) < 0.01
+        %     break; 
+        % end
+        iter = iter+1; 
+    end
+end

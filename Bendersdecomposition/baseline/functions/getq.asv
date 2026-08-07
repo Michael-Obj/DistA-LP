@@ -1,0 +1,18 @@
+function w = getq(distances,lambda,range_threshold,alpha_hat)
+for i=1:length(distances)
+    for j=1:length(distances)
+        d=distances(i,j);
+        if(d<range_threshold)
+            % w(i,j) = exp(-lambda * d*0.4); % function 1       lambda=0.5
+            w(i,j) = 1/(1+d^lambda);% function 2          lamnda=1.5
+            % w(i,j) = 2/(1+exp(lambda * d));% function 3     lambda=0.75
+        else
+            % w(i,j) = exp(-lambda * range_threshold*20);
+            w(i,j) = 1/(1+100*range_threshold^lambda);% function 2
+            % w(i,j) = 2/(1+exp(lambda * range_threshold));% function 3
+        end
+    end
+end
+w = alpha_hat*w;
+end
+

@@ -1,0 +1,3 @@
+timestamp,stage,city,node_count,user_id,repeat_id,runtime_sec,value1,value2,matlab_mem_used_bytes,matlab_mem_available_all_arrays_bytes,matlab_max_possible_array_bytes,physical_mem_available_bytes,physical_mem_total_bytes,detail
+2026-07-10 11:00:34,after_load,london,2000,1,1,NaN,NaN,NaN,2457489408,17103638528,17103638528,20870275072,68424036352,loaded inputs
+2026-07-10 11:01:20,after_panda,london,2000,1,1,45.1571265,391282688,128447555,2850181120,16845271040,16845271040,20596228096,68424036352,mem_delta_bytes=391282688; selected_workspace_bytes=128447555; loss_ep4=5728.6554; loss_ep7=5728.6518; loss_ep10=5728.5482; time_2PPO_ep4=1.527; time_2PPO_ep7=0.1421; time_2PPO_ep10=0.1215
