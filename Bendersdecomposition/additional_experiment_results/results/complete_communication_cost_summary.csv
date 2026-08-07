@@ -1,0 +1,6 @@
+Representation,upload_to_server_bytes,download_from_server_bytes,second_upload_to_downstream_bytes,total_end_to_end_bytes,upload_compression,end_to_end_compression,upload_to_server_kb,download_from_server_kb,second_upload_to_downstream_kb,total_end_to_end_kb,downstream_encoding
+Raw matrices,9600,3200,8,12808,1,1,9.375,3.125,0.0078125,12.5078125,Index y_m
+Gaussian,304,3200,8,3512,31.5789473684211,3.64692482915718,0.296875,3.125,0.0078125,3.4296875,Index y_m
+Polynomial,400,3200,8,3608,24,3.54988913525499,0.390625,3.125,0.0078125,3.5234375,Index y_m
+RBF,760,3200,8,3968,12.6315789473684,3.22782258064516,0.7421875,3.125,0.0078125,3.875,Index y_m
+SVD,1640,3200,8,4848,5.85365853658537,2.64191419141914,1.6015625,3.125,0.0078125,4.734375,Index y_m

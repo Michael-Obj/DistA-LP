@@ -1,0 +1,42 @@
+\begin{table*}[t]
+\centering
+\caption{Memory cost across different baseline perturbation methods. Mean$\pm$1.96$\times$standard error; unavailable results are labeled by ``---'.}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ll|ccc|ccc|ccc}
+\hline
+\multicolumn{2}{c|}{Number of records} & \multicolumn{3}{c|}{2,000} & \multicolumn{3}{c|}{4,000} & \multicolumn{3}{c}{6,000} \\
+\multicolumn{2}{c|}{Privacy budget (km$^{-1}$)} & $\epsilon=4.0$ & $\epsilon=7.0$ & $\epsilon=10.0$ & $\epsilon=4.0$ & $\epsilon=7.0$ & $\epsilon=10.0$ & $\epsilon=4.0$ & $\epsilon=7.0$ & $\epsilon=10.0$ \\
+\hline
+\multicolumn{11}{c}{Rome road map} \\
+\hline
+Pre-defined Noise Distribution & EM & 656.00 KB & 656.00 KB & 656.00 KB & 1.31 MB & 1.31 MB & 1.31 MB & 1.97 MB & 1.97 MB & 1.97 MB \\
+Pre-defined Noise Distribution & Laplace & 640.00 KB & 640.00 KB & 640.00 KB & 1.28 MB & 1.28 MB & 1.28 MB & 1.92 MB & 1.92 MB & 1.92 MB \\
+Hybrid Method & RMP & 976.49 KB & 976.49 KB & 976.49 KB & 1.95 MB & 1.95 MB & 1.95 MB & 2.93 MB & 2.93 MB & 2.93 MB \\
+Hybrid Method & COPT & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+Optimization Based Methods & LP & 25.6 TB & 25.6 TB & 25.6 TB & 204.7 TB & 204.7 TB & 204.7 TB & 691.1 TB & 691.1 TB & 691.1 TB \\
+Optimization Based Methods & LP-A & 392.00 MB & 392.00 MB & 392.00 MB & 392.00 MB & 392.00 MB & 392.00 MB & 392.00 MB & 392.00 MB & 392.00 MB \\
+Optimization Based Methods & PAnDA & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\hline
+\multicolumn{11}{c}{London road map} \\
+\hline
+Pre-defined Noise Distribution & EM & 656.00 KB & 656.00 KB & 656.00 KB & 1.31 MB & 1.31 MB & 1.31 MB & 1.97 MB & 1.97 MB & 1.97 MB \\
+Pre-defined Noise Distribution & Laplace & 640.00 KB & 640.00 KB & 640.00 KB & 1.28 MB & 1.28 MB & 1.28 MB & 1.92 MB & 1.92 MB & 1.92 MB \\
+Hybrid Method & RMP & 976.49 KB & 976.49 KB & 976.49 KB & 1.95 MB & 1.95 MB & 1.95 MB & 2.93 MB & 2.93 MB & 2.93 MB \\
+Hybrid Method & COPT & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+Optimization Based Methods & LP & 25.6 TB & 25.6 TB & 25.6 TB & 204.7 TB & 204.7 TB & 204.7 TB & 691.1 TB & 691.1 TB & 691.1 TB \\
+Optimization Based Methods & LP-A & 522.72 MB & 522.72 MB & 522.72 MB & 522.72 MB & 522.72 MB & 522.72 MB & 522.72 MB & 522.72 MB & 522.72 MB \\
+Optimization Based Methods & PAnDA & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\hline
+\multicolumn{11}{c}{New York City road map} \\
+\hline
+Pre-defined Noise Distribution & EM & 656.00 KB & 656.00 KB & 656.00 KB & 1.31 MB & 1.31 MB & 1.31 MB & 1.97 MB & 1.97 MB & 1.97 MB \\
+Pre-defined Noise Distribution & Laplace & 640.00 KB & 640.00 KB & 640.00 KB & 1.28 MB & 1.28 MB & 1.28 MB & 1.92 MB & 1.92 MB & 1.92 MB \\
+Hybrid Method & RMP & 976.49 KB & 976.49 KB & 976.49 KB & 1.95 MB & 1.95 MB & 1.95 MB & 2.93 MB & 2.93 MB & 2.93 MB \\
+Hybrid Method & COPT & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+Optimization Based Methods & LP & 25.6 TB & 25.6 TB & 25.6 TB & 204.7 TB & 204.7 TB & 204.7 TB & 691.1 TB & 691.1 TB & 691.1 TB \\
+Optimization Based Methods & LP-A & 184.95 MB & 184.95 MB & 184.95 MB & 184.95 MB & 184.95 MB & 184.95 MB & 184.95 MB & 184.95 MB & 184.95 MB \\
+Optimization Based Methods & PAnDA & --- & --- & --- & --- & --- & --- & --- & --- & --- \\
+\hline
+\end{tabular}%
+}
+\end{table*}

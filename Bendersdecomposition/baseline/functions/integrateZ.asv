@@ -1,0 +1,8 @@
+function Z = integrateZ(agent, NR_LOC_IN_TARGET, NR_OBFLOC)
+    Z = zeros(NR_LOC_IN_TARGET, NR_OBFLOC); 
+    NR_AGENT = size(agent, 2); 
+    for i = 1:1:NR_AGENT
+        if size(agent(i).decision, 1)*
+        Z(agent(i).node_intraset, :) = agent(i).decision'; 
+    end
+end

@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\caption{End-to-end communication cost of DISTA-LP.}
+\label{tab:communication-cost}
+\begin{tabular}{lrrrrrr}
+\toprule
+Representation & Upload & Download & Second Upload & Total & Upload Comp. & End-to-End Comp. \\
+\midrule
+Raw matrices & 9600 & 3200 & 8 & 12808 & 1.00$\times$ & 1.00$\times$ \\
+Gaussian & 304 & 3200 & 8 & 3512 & 31.58$\times$ & 3.65$\times$ \\
+Polynomial & 400 & 3200 & 8 & 3608 & 24.00$\times$ & 3.55$\times$ \\
+RBF & 760 & 3200 & 8 & 3968 & 12.63$\times$ & 3.23$\times$ \\
+SVD & 1640 & 3200 & 8 & 4848 & 5.85$\times$ & 2.64$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}

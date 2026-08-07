@@ -130,7 +130,7 @@ S = load('Bendersdecomposition/rome_location_data_2000_nodes/location_data_sampl
          'lon_sel','lat_sel','node_tar','obf_ID');   % add 'LR_ID' if you need it later
 
 % Treat the saved selected set as your "original" set
-col_osmid_selected  = S.node_tar;        % if you still print/use osmid list
+col_osmid_selected  = S.node_tar;            % if you still print/use osmid list
 col_longitude_selected  = S.lon_sel(:);      % for plotting
 col_latitude_selected   = S.lat_sel(:);
 
@@ -236,8 +236,8 @@ time_compute_distance_matrix = toc;
 
 
 %% Use captial letters for the constants 
-EPSILON = 4;  % EPSILON value for noise
-B_VALUE = 1/ EPSILON;  % B_VALUE for perturbation probability calculation
+EPSILON = 4;             % EPSILON value for noise
+B_VALUE = 1/ EPSILON;    % B_VALUE for perturbation probability calculation
 CARDINALITY_N = numel(nearest_longitude);
 lambda2 = 1.0;
 lambda3 = 1.0;
@@ -257,10 +257,8 @@ for i = 1:num_locations
     raw_distance_matrix_unaligned = compute_distance_matrix([original_latitude(i); nearest_latitude], ...
                                                                 [original_longitude(i); nearest_longitude]);
 
-
     % Store the aligned distance matrix in the cell array
     original_distance_matrices{i} = raw_distance_matrix_unaligned;
-
 
     % Display Results
     fprintf('Results for Location %d:\n', i);
@@ -281,17 +279,14 @@ for i = 1:num_locations
     % Select the 9 nearest neighbors for the current location
     % [nearest_longitude, nearest_latitude] = select_nearest_neighbors(original_longitude, original_latitude, i, CARDINALITY_N - 1);
 
-
     % Compute the raw distance matrix before alignment
     raw_distance_matrix_unaligned = compute_raw_distance_matrix([original_longitude(i); nearest_longitude], ...
                                                                 [original_latitude(i); nearest_latitude], ...
                                                                 obfuscated_longitude, ...
                                                                 obfuscated_latitude);
-
     
     % Store the aligned distance matrix in the cell array
     obfuscated_distance_matrices{i} = raw_distance_matrix_unaligned;
-
 
     % Display Results
     fprintf('Results for Location %d:\n', i);
@@ -320,10 +315,8 @@ for i = 1:num_locations
                                                             df_edges, ...
                                                             df_nodes);
 
-
     % Store the aligned distance matrix in the cell array
     cost_distance_matrix_original{i} = raw_distance_matrix_original_unaligned;
-
 
     % Display Results
     fprintf('Results for Location %d:\n', i);
@@ -392,8 +385,8 @@ stats_store = cell(num_locations,1);
 
 NUM_CENTRES = 25;                              % try 9, 16, 25 … larger ⇒ more flexible, slower
 % n = CARDINALITY_N;
-n = size(original_distance_matrices{1}, 1);   % first A1 gives n
-SIGMA        = 0.35*n;                        % bandwidth — tweak per dataset (0.3 - 0.5)
+n = size(original_distance_matrices{1}, 1);    % first A1 gives n
+SIGMA        = 0.35*n;                         % bandwidth — tweak per dataset (0.3 - 0.5)
 lambda2      = 1.0;
 lambda3      = 1.0;
 % preallocate

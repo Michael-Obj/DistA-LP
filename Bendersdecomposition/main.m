@@ -121,11 +121,11 @@ parameters;
 
 Regions = [ ...
  %% ROME DATASET (FOR 2000 NODES)
- % struct('lon_min',12.2,'lon_max',12.4,'lat_min',41.901,'lat_max',42.10)
- % struct('lon_min',12.2,'lon_max',12.4,'lat_min',41.701,'lat_max',41.90)
- % struct('lon_min',12.401,'lon_max',12.6,'lat_min',41.901,'lat_max',42.10)
- % struct('lon_min',12.401,'lon_max',12.6,'lat_min',41.701,'lat_max',41.90)
- % struct('lon_min',12.601,'lon_max',12.8,'lat_min',41.801,'lat_max',42.00) ];      
+ struct('lon_min',12.2,'lon_max',12.4,'lat_min',41.901,'lat_max',42.10)
+ struct('lon_min',12.2,'lon_max',12.4,'lat_min',41.701,'lat_max',41.90)
+ struct('lon_min',12.401,'lon_max',12.6,'lat_min',41.901,'lat_max',42.10)
+ struct('lon_min',12.401,'lon_max',12.6,'lat_min',41.701,'lat_max',41.90)
+ struct('lon_min',12.601,'lon_max',12.8,'lat_min',41.801,'lat_max',42.00) ];      
 
  %% ROME DATASET (4000 $ 6000 NODES)
  % struct('lon_min',12.2,'lon_max',12.4,'lat_min',41.701,'lat_max',42.10)
@@ -154,13 +154,13 @@ Regions = [ ...
 
 
 
- %% LONDON DATASET
- struct('lon_min',-0.5,'lon_max',-0.3,'lat_min',51.4,'lat_max',51.6)
- struct('lon_min',-0.301,'lon_max',-0.1,'lat_min',51.501,'lat_max',51.7)
- struct('lon_min',-0.301,'lon_max',-0.1,'lat_min',51.3,'lat_max',51.5)
- % struct('lon_min',-0.101,'lon_max',0.1,'lat_min',51.501,'lat_max',51.7)
- struct('lon_min',-0.101,'lon_max',0.1,'lat_min',51.3,'lat_max',51.5)
- struct('lon_min',0.101,'lon_max',0.3,'lat_min',51.4,'lat_max',51.6) ];
+ %% LONDON DATASET (2000, 4000, 6000, 8000 $ 1000 NODES)
+ % struct('lon_min',-0.5,'lon_max',-0.3,'lat_min',51.4,'lat_max',51.6)
+ % struct('lon_min',-0.301,'lon_max',-0.1,'lat_min',51.501,'lat_max',51.7)
+ % struct('lon_min',-0.301,'lon_max',-0.1,'lat_min',51.3,'lat_max',51.5)
+ % % struct('lon_min',-0.101,'lon_max',0.1,'lat_min',51.501,'lat_max',51.7)
+ % struct('lon_min',-0.101,'lon_max',0.1,'lat_min',51.3,'lat_max',51.5)
+ % struct('lon_min',0.101,'lon_max',0.3,'lat_min',51.4,'lat_max',51.6) ];
 R = numel(Regions);
 
 
@@ -218,9 +218,9 @@ RandStream.setGlobalStream(stream);                 % make it the global RNG
 %% SVD APPROXIMATION
 
 %% 2000 NODES
-% budget_assigned_rome_svd = [2.18546+2.81987+2.69885, 2.53849+1.99343+3.83922, 2.35294+1.94143+2.51932, 1.826+1.56157+2.81624, 2.9957+1.84421+3.62236;
-%                             1.53118+1.90233+1.89665, 1.77391+1.37776+2.70288, 1.6383+1.3368+1.74504, 1.2675+1.07978+1.96616, 2.10123+1.27424+2.53739;
-%                             0.878507+0.999485+1.09303, 1.01561+0.764918+1.58353, 0.931265+0.739451+0.979383, 0.712727+0.602883+1.11846, 1.21244+0.710438+1.45168];
+budget_assigned_rome_svd = [2.18546+2.81987+2.69885, 2.53849+1.99343+3.83922, 2.35294+1.94143+2.51932, 1.826+1.56157+2.81624, 2.9957+1.84421+3.62236;
+                            1.53118+1.90233+1.89665, 1.77391+1.37776+2.70288, 1.6383+1.3368+1.74504, 1.2675+1.07978+1.96616, 2.10123+1.27424+2.53739;
+                            0.878507+0.999485+1.09303, 1.01561+0.764918+1.58353, 0.931265+0.739451+0.979383, 0.712727+0.602883+1.11846, 1.21244+0.710438+1.45168];
 
 
 % budget_assigned_nyc_svd = [2.20619+1.41263+1.78887, 3.08017+1.69431+3.56499, 2.03086+1.4251+1.75134, 2.80096+1.89003+2.99041;
@@ -266,16 +266,16 @@ RandStream.setGlobalStream(stream);                 % make it the global RNG
 %% 8000 NODES
 
 
-budget_assigned_london_svd = [2.55543+1.51772+2.1159	2.22946+1.66026+1.36408	1.96005+1.23427+1.35916	2.47258+2.35932+2.07946	2.25706+1.81665+1.41181	2.52219+2.13777+3.40893;
-                              1.77623+1.05807+1.48815	1.55195+1.1418+0.954854	1.37311+0.84555+0.948043	1.72342+1.60311+1.47309	1.58982+1.25001+0.987592	1.76897+1.4639+2.38635; 
-                              1.00547+0.600049+0.858469	0.879415+0.626917+0.533691	0.788681+0.477735+0.53871	0.986567+0.877025+0.862396	0.923459+0.686083+0.553896	1.01301+0.794106+1.36408];
+% budget_assigned_london_svd = [2.55543+1.51772+2.1159	2.22946+1.66026+1.36408	1.96005+1.23427+1.35916	2.47258+2.35932+2.07946	2.25706+1.81665+1.41181	2.52219+2.13777+3.40893;
+%                               1.77623+1.05807+1.48815	1.55195+1.1418+0.954854	1.37311+0.84555+0.948043	1.72342+1.60311+1.47309	1.58982+1.25001+0.987592	1.76897+1.4639+2.38635; 
+%                               1.00547+0.600049+0.858469	0.879415+0.626917+0.533691	0.788681+0.477735+0.53871	0.986567+0.877025+0.862396	0.923459+0.686083+0.553896	1.01301+0.794106+1.36408];
 
 
 
 %% 10000 NODES
-budget_assigned_rome_svd = [1.32127+0.816568+2.23292	1.41095+2.024+3.17445	1.69799+2.00649+2.78936;
-                            0.927028+0.569959+1.56286	0.9809+1.40295+2.22484	1.19234+1.38075+1.95344;
-                            0.53374+0.324043+0.892853	0.555674+0.781799+1.26164	0.686444+0.761744+1.11716];
+% budget_assigned_rome_svd = [1.32127+0.816568+2.23292	1.41095+2.024+3.17445	1.69799+2.00649+2.78936;
+%                             0.927028+0.569959+1.56286	0.9809+1.40295+2.22484	1.19234+1.38075+1.95344;
+%                             0.53374+0.324043+0.892853	0.555674+0.781799+1.26164	0.686444+0.761744+1.11716];
 
 %% GAUSSIAN APPROXIMATION
 %% 2000 NODES
@@ -360,7 +360,7 @@ budget_assigned_rome_svd = [1.32127+0.816568+2.23292	1.41095+2.024+3.17445	1.697
 %% Select the algorithm here
 approx_matrix = 1;  % 1: approximated matrix is used; 0: approximated matrix is not used
 epsilon_value = [10, 7, 4]; 
-budget_assigned = budget_assigned_london_svd;
+budget_assigned = budget_assigned_rome_svd;
 for ep_idx = 1:1:3
     % budget_assigned = budget_assigned_rome_svd_10;
 
@@ -380,9 +380,9 @@ for ep_idx = 1:1:3
         env_parameters.latitude_min  = Regions(r).lat_min;
         env_parameters.latitude_max  = Regions(r).lat_max;
     
-        env_parameters.nr_loc_selected = 500; 
-       
-        env_parameters.nr_loc_selected = NR_LOC*2000; 
+        env_parameters.nr_loc_selected = 2000; 
+
+        % env_parameters.nr_loc_selected = NR_LOC*2000; 
         
         
         %% Initialization

@@ -1,15 +1,29 @@
-function [best_pi, best_params, F1, F2, F3] = reorder_fit_gaussians(A1, A2, A3, lambda2, lambda3)
-    % Input:
-    %   A1: n x n symmetric matrix
-    %   A2, A3: n x m matrices
-    %   lambda2, lambda3: weighting terms
-    % Output:
-    %   best_pi: optimal permutation indices
-    %   best_params: Gaussian parameters (6 per component)
-    %   F1, F2, F3: learned Gaussian target functions
+function [best_pi, best_params, F1, F2, F3, stats] = reorder_fit_gaussians(A1, A2, A3, lambda2, lambda3)
+%REORDER_FIT_GAUSSIANS Alternating scheme with instrumentation + convergence logging
+%
+% Adds:
+%   - per-outer-iteration timing (swap search vs fminsearch)
+%   - loss history
+%   - swap eval/accept counts
+%   - tolerance-based stopping + max_iter cap
+%
+% Output:
+%   stats struct with fields:
+%     .outer_iters, .converged, .stop_reason
+%     .loss_hist
+%     .swap_evals, .swap_accepts
+%     .time_swap, .time_fit, .time_total
+
+    t_total = tic;
 
     [n, m] = size(A2);
     pi_current = 1:n; % Start with identity permutation
+
+    % ---- Hyperparameters for convergence study ----
+    max_iter = 20;            % cap (report how often reached)
+    tol_rel  = 0;             % relative improvement tolerance
+    tol_abs  = 0;             % optional absolute tolerance (set >0 if you want)
+    max_fun_evals = 1000;     % for fminsearch
 
     % Random initial Gaussian parameters [cx, cy, sx, sy, A, b] for each of 3 components
     params_current = [
@@ -18,51 +32,158 @@ function [best_pi, best_params, F1, F2, F3] = reorder_fit_gaussians(A1, A2, A3, 
         n/2, m/2, n/4, m/4, 1.0, 0.0      % F3
     ];
 
-    % Optimize Gaussian parameters first
-    options = optimset('Display', 'off', 'MaxFunEvals', 1000);
-    params_current = fminsearch(@(p) compute_loss(A1, A2, A3, pi_current, p, lambda2, lambda3), params_current, options);
+    % fminsearch options
+    options = optimset('Display','off', 'MaxFunEvals', max_fun_evals);
+
+    % ---- Initial parameter fit ----
+    t_fit0 = tic;
+    params_current = fminsearch(@(p) compute_loss(A1, A2, A3, pi_current, p, lambda2, lambda3), ...
+                                params_current, options);
+    time_fit_init = toc(t_fit0);
+
     loss_current = compute_loss(A1, A2, A3, pi_current, params_current, lambda2, lambda3);
 
-    max_iter = 10;
+    % ---- Preallocate stats ----
+    loss_hist       = nan(max_iter+1, 1);   % loss after refit (outer iteration)
+    loss_swap_best  = nan(max_iter, 1);     % best loss achieved during swap search (optional)
+    time_swap       = zeros(max_iter, 1);
+    time_fit        = zeros(max_iter, 1);
+    swap_evals      = zeros(max_iter, 1);
+    swap_accepts    = zeros(max_iter, 1);
+    loss_refit_only = nan(max_iter, 1);     % refit-only diagnostic
+    time_refit_only = zeros(max_iter, 1);   % optional timing
+
+
+    loss_hist(1) = loss_current;
+
+    converged  = false;
+    stop_reason = "max_iter_reached";
+
+    % ---- Alternating outer loop ----
     for iter = 1:max_iter
+        % ---- Refit-only diagnostic (no swaps) ----
+        pi_before = pi_current;
+        p_before  = params_current;
+        
+        t_refit_only = tic;
+        p_refit_only = fminsearch(@(p) compute_loss(A1, A2, A3, pi_before, p, lambda2, lambda3), ...
+                                  p_before, options);
+        time_refit_only(iter) = toc(t_refit_only);
+
+        loss_refit_only(iter) = compute_loss(A1, A2, A3, pi_before, p_refit_only, lambda2, lambda3);
+        %---------------------
+
         improved = false;
 
-        % Try swapping two indices to improve permutation
+        % ===== (1) Permutation improvement by greedy swaps =====
+        t_swap_iter = tic;
+        accepts_this_iter = 0;
+        evals_this_iter   = 0;
+        best_loss_in_swaps = loss_current;          % track best loss reached in swap phase
+
         for i = 1:n
             for j = i+1:n
+                evals_this_iter = evals_this_iter + 1;
+    
                 pi_trial = pi_current;
-                pi_trial([i j]) = pi_trial([j i]); % Swap i and j
-
+                pi_trial([i j]) = pi_trial([j i]);  % swap
+    
                 loss_trial = compute_loss(A1, A2, A3, pi_trial, params_current, lambda2, lambda3);
+    
                 if loss_trial < loss_current
-                    pi_current = pi_trial;
-                    loss_current = loss_trial;
-                    improved = true;
+                    pi_current   = pi_trial;
+                    loss_current = loss_trial;      % <-- this is the "loss_current during swaps"
+                    improved     = true;
+                    accepts_this_iter = accepts_this_iter + 1;
+                end
+    
+                if loss_current < best_loss_in_swaps
+                    best_loss_in_swaps = loss_current;
                 end
             end
         end
-
-        % Re-optimize Gaussian parameters given new permutation
-        params_current = fminsearch(@(p) compute_loss(A1, A2, A3, pi_current, p, lambda2, lambda3), params_current, options);
-        loss_current = compute_loss(A1, A2, A3, pi_current, params_current, lambda2, lambda3);
-
+    
+        time_swap(iter)    = toc(t_swap_iter);
+        swap_evals(iter)   = evals_this_iter;
+        swap_accepts(iter) = accepts_this_iter;
+        loss_swap_best(iter) = best_loss_in_swaps;   % optional
+    
+        % ===== (2) Re-optimize Gaussian parameters given new permutation =====
+        t_fit_iter = tic;
+        params_current = fminsearch(@(p) compute_loss(A1, A2, A3, pi_current, p, lambda2, lambda3), ...
+                                    params_current, options);
+        time_fit(iter) = toc(t_fit_iter);
+    
+        % Loss after refit
+        loss_new = compute_loss(A1, A2, A3, pi_current, params_current, lambda2, lambda3);
+    
+        loss_current = loss_new;          % <-- IMPORTANT: keep loss_current consistent
+        loss_hist(iter+1) = loss_current; % <-- log per-iteration loss_current
+    
+        % ===== Stopping criteria =====
         if ~improved
-            break; % No permutation improvement, done
+            converged = true;
+            stop_reason = "no_improving_swap";
+            break;
         end
+
+        % if (rel_impr < tol_rel) || (tol_abs > 0 && abs_impr < tol_abs)
+        %     converged = true;
+        %     stop_reason = "tolerance_reached";
+        %     loss_current = loss_new;
+        %     break;
+        % end
+
+        % loss_current = loss_new;
     end
 
-    best_pi = pi_current;
+    outer_iters = find(~isnan(loss_hist), 1, 'last') - 1; % number of completed outer iters
+
+    % Trim arrays to actual iterations
+    loss_hist_trim  = loss_hist(1:outer_iters+1);
+    loss_swap_best  = loss_swap_best(1:outer_iters);
+    time_swap       = time_swap(1:outer_iters);
+    time_fit        = time_fit(1:outer_iters);
+    swap_evals      = swap_evals(1:outer_iters);
+    swap_accepts    = swap_accepts(1:outer_iters);
+    loss_refit_only = loss_refit_only(1:outer_iters);
+    time_refit_only = time_refit_only(1:outer_iters);
+
+
+    % Final outputs
+    best_pi     = pi_current;
     best_params = params_current;
 
-    % Generate final learned Gaussians
     [F1, F2, F3] = generate_gaussians(n, m, best_params);
 
+    % Stats package
+    stats = struct();
+    stats.outer_iters   = outer_iters;
+    stats.converged     = converged;
+    stats.stop_reason   = char(stop_reason);
+    stats.loss_hist     = loss_hist_trim;         % loss_current after each refit
+    stats.swap_evals    = swap_evals;
+    stats.swap_accepts  = swap_accepts;
+    stats.time_swap     = time_swap;
+    stats.time_fit      = time_fit;
+    stats.time_fit_init = time_fit_init;
+    stats.time_total    = toc(t_total);       
+    stats.loss_swap_best  = loss_swap_best;        % optional: best loss during swap phase
+    stats.loss_refit_only = loss_refit_only;
+    stats.time_refit_only = time_refit_only;       % optional
+
+
+
+    % Optional prints (turn off if too verbose)
     fprintf('Best permutation: [%s]\n', num2str(best_pi));
     fprintf('Best Gaussian params (6 per component):\n');
     disp(reshape(best_params, 6, 3)');
-    fprintf('Minimum L1 loss: %.4f\n', loss_current);
+    fprintf('Final loss: %.6f | outer iters: %d | stop: %s | total time: %.3fs\n', ...
+            loss_hist_trim(end), outer_iters, stats.stop_reason, stats.time_total);
 end
 
+
+% ========================= Helper functions (unchanged logic) =========================
 function loss = compute_loss(A1, A2, A3, pi, params, lambda2, lambda3)
     [n, m] = size(A2);
     [F1, F2, F3] = generate_gaussians(n, m, params);
@@ -82,7 +203,6 @@ function [F1, F2, F3] = generate_gaussians(n, m, params)
     [I1, J1] = meshgrid(1:n, 1:n);
     [I2, J2] = meshgrid(1:n, 1:m);
 
-    % Unpack parameters for each Gaussian
     p1 = params(1:6);
     p2 = params(7:12);
     p3 = params(13:18);
@@ -96,150 +216,3 @@ function val = gaussian2d(x, y, cx, cy, sx, sy, A, b)
     exponent = -((x - cx).^2 ./ (2 * sx^2) + (y - cy).^2 ./ (2 * sy^2));
     val = A * exp(exponent) + b;
 end
-
-
-
-
-
-
-% function [best_pi, best_params, F1, F2, F3] = reorder_fit_gaussians(A1, A2, A3, lambda2, lambda3)
-%     % Input:
-%     %   A1: n x n symmetric matrix
-%     %   A2, A3: n x m matrices
-%     %   lambda2, lambda3: weighting terms
-%     % Output:
-%     %   best_pi: optimal permutation indices
-%     %   best_params: Gaussian parameters
-%     %   F1, F2, F3: learned Gaussian target functions
-% 
-% 
-%     [n, m] = size(A2);
-%     pi_current = 1:n; % Start with identity permutation
-% 
-% 
-%     % Random initial Gaussian parameters
-%     params_current = [
-%         n/2, n/2, n/4, n/4, ... % F1
-%         n/2, m/2, n/4, m/4, ... % F2
-%         n/2, m/2, n/4, m/4  % F3
-%     ];
-% 
-% 
-%     % Optimize Gaussian parameters first
-%     options = optimset('Display', 'off', 'MaxFunEvals', 1000);
-%     params_current = fminsearch(@(p) compute_loss(A1, A2, A3, pi_current, p, lambda2, lambda3), params_current, options);
-% 
-% 
-%     loss_current = compute_loss(A1, A2, A3, pi_current, params_current, lambda2, lambda3);
-% 
-% 
-%     max_iter = 10;
-%     for iter = 1:max_iter
-%         improved = false;
-% 
-% 
-%         % Try swapping two indices to improve permutation
-%         for i = 1:n
-%             for j = i+1:n
-%                 pi_trial = pi_current;
-%                 pi_trial([i j]) = pi_trial([j i]); % Swap i and j
-% 
-% 
-%                 loss_trial = compute_loss(A1, A2, A3, pi_trial, params_current, lambda2, lambda3);
-% 
-% 
-%                 if loss_trial < loss_current
-%                     pi_current = pi_trial;
-%                     loss_current = loss_trial;
-%                     improved = true;
-%                 end
-%             end
-%         end
-% 
-% 
-%         % Re-optimize Gaussian parameters given new permutation
-%         params_current = fminsearch(@(p) compute_loss(A1, A2, A3, pi_current, p, lambda2, lambda3), params_current, options);
-%         loss_current = compute_loss(A1, A2, A3, pi_current, params_current, lambda2, lambda3);
-% 
-% 
-%         if ~improved
-%             break; % No permutation improvement, done
-%         end
-%     end
-% 
-% 
-%     best_pi = pi_current;
-%     best_params = params_current;
-% 
-% 
-%     % Generate final learned Gaussians
-%     [F1, F2, F3] = generate_gaussians(n, m, best_params);
-% 
-% 
-%     fprintf('Best permutation: [%s]\n', num2str(best_pi));
-%     fprintf('Best Gaussian params:\n');
-%     disp(reshape(best_params, 4, 3)');
-%     fprintf('Minimum L1 loss: %.4f\n', loss_current);
-% 
-% 
-%     % Visualization
-%     A1_reordered = A1(best_pi, best_pi);
-%     A2_reordered = A2(best_pi, :);
-%     A3_reordered = A3(best_pi, :);
-% 
-% 
-%     % figure('Name', 'Matrix Reordering (Smart Optimization)', 'Position', [100, 100, 1600, 800]);
-%     % 
-%     % 
-%     % subplot(3, 4, 1); imagesc(A1); colorbar; title('Original A_1');
-%     % subplot(3, 4, 2); imagesc(F1); colorbar; title('Learned Target F_1');
-%     % subplot(3, 4, 3); imagesc(A1_reordered); colorbar; title('Permuted A_1');
-%     % 
-%     % 
-%     % subplot(3, 4, 5); imagesc(A2); colorbar; title('Original A_2');
-%     % subplot(3, 4, 6); imagesc(F2); colorbar; title('Learned Target F_2');
-%     % subplot(3, 4, 7); imagesc(A2_reordered); colorbar; title('Permuted A_2');
-%     % 
-%     % 
-%     % subplot(3, 4, 9); imagesc(A3); colorbar; title('Original A_3');
-%     % subplot(3, 4, 10); imagesc(F3); colorbar; title('Learned Target F_3');
-%     % subplot(3, 4, 11); imagesc(A3_reordered); colorbar; title('Permuted A_3');
-% end
-% 
-% 
-% function loss = compute_loss(A1, A2, A3, pi, params, lambda2, lambda3)
-%     [n, m] = size(A2);
-% 
-% 
-%     [F1, F2, F3] = generate_gaussians(n, m, params);
-% 
-% 
-%     A1p = A1(pi, pi);
-%     A2p = A2(pi, :);
-%     A3p = A3(pi, :);
-% 
-% 
-%     loss1 = sum(abs(A1p(:) - F1(:)));
-%     loss2 = sum(abs(A2p(:) - F2(:)));
-%     loss3 = sum(abs(A3p(:) - F3(:)));
-% 
-% 
-%     loss = loss1 + lambda2 * loss2 + lambda3 * loss3;
-% end
-% 
-% 
-% function [F1, F2, F3] = generate_gaussians(n, m, params)
-%     [I1, J1] = meshgrid(1:n, 1:n);
-%     [I2, J2] = meshgrid(1:n, 1:m);
-% 
-% 
-%     F1 = gaussian2d(I1, J1, params(1), params(2), params(3), params(4));
-%     F2 = gaussian2d(I2, J2, params(5), params(6), params(7), params(8));
-%     F3 = gaussian2d(I2, J2, params(9), params(10), params(11), params(12));
-% end
-% 
-% 
-% function val = gaussian2d(x, y, cx, cy, sx, sy)
-%     val = exp(-((x - cx).^2 ./ (2 * sx^2) + (y - cy).^2 ./ (2 * sy^2)));
-% end
-

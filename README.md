@@ -35,6 +35,7 @@ DistributedLP/
 │   ├── PL_mean_std.m                  # Privacy loss statistics computation
 │   ├── loss_for_benchmark.m           # Benchmark loss evaluation
 │   ├── coarse.m                       # Coarse-grid baseline implementation
+│   ├── baseline/                      # Baseline resources
 │   ├── classes/                       # Object-oriented components
 │   │   ├── Server/                    # Server-side LP solver
 │   │   ├── User/                      # User-side surrogate fitting
@@ -45,17 +46,14 @@ DistributedLP/
 │   │   ├── read_files/                # Dataset I/O utilities
 │   │   └── haversine/                 # Haversine distance calculations
 │   ├── dataset/                       # Dataset configuration
-│   ├── datasets/                      # Processed road-network data files
-│   │   ├── rome_*.csv                 # Rome OSM road network (nodes, edges)
-│   │   ├── london_*.csv               # London OSM road network
-│   │   └── nyc_*.csv                  # New York City OSM road network
 │   ├── rome_location_data_*/          # Preprocessed Rome location subsets (2K-10K nodes)
 │   ├── london_location_data_*/        # Preprocessed London location subsets
 │   ├── nyc_location_data_*/           # Preprocessed NYC location subsets
 │   ├── rome_baseline_results/         # Rome experimental results
 │   ├── london_baseline_results/       # London experimental results
 │   ├── nyc_baseline_results/          # NYC experimental results
-│   └── results/                       # Output directory for latest experiments
+│   ├── results/                       # Output directory for latest experiments
+│   └── additional_experiment_results/ # Output directory for additional experiments during review 
 ├── functions/                         # Legacy/utility functions
 ├── figure_tools/                      # Visualization helpers
 ├── datasets/                          # Additional dataset resources

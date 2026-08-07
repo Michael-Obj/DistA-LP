@@ -308,10 +308,8 @@ for i = 1:num_locations
     raw_distance_matrix_unaligned = compute_distance_matrix([original_latitude(i); nearest_latitude], ...
                                                                 [original_longitude(i); nearest_longitude]);
 
-
     % Store the aligned distance matrix in the cell array
     original_distance_matrices{i} = raw_distance_matrix_unaligned;
-
 
     % Display Results
     fprintf('Results for Location %d:\n', i);
@@ -339,10 +337,8 @@ for i = 1:num_locations
                                                                 obfuscated_longitude, ...
                                                                 obfuscated_latitude);
 
-    
     % Store the aligned distance matrix in the cell array
     obfuscated_distance_matrices{i} = raw_distance_matrix_unaligned;
-
 
     % Display Results
     fprintf('Results for Location %d:\n', i);
@@ -371,10 +367,8 @@ for i = 1:num_locations
                                                             df_edges, ...
                                                             df_nodes);
 
-
     % Store the aligned distance matrix in the cell array
     cost_distance_matrix_original{i} = raw_distance_matrix_original_unaligned;
-
 
     % Display Results
     fprintf('Results for Location %d:\n', i);
