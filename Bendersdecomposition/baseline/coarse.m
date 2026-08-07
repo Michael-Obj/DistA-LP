@@ -6,7 +6,11 @@ addpath('./functions/myBDToolbox');                                         % My
 addpath('./functions/myPlotToolbox');                                       % My plot toolbox
 
 addpath('./functions/haversine');                                           % Read the Haversine distance package. This package is created by Created by Josiah Renfree, May 27, 2010
-parameters;                                                                 % Read the parameters of the simulation
+% Keep parameters selected by the calling runner (especially EPSILON).
+% Initialize defaults only when coarse.m is executed by itself.
+if ~exist('env_parameters', 'var')
+    parameters;
+end
 
 %fprintf('------------------- Environment settings --------------------- \n \n'); 
 

@@ -35,6 +35,7 @@ DistributedLP/
 │   ├── PL_mean_std.m                  # Privacy loss statistics computation
 │   ├── loss_for_benchmark.m           # Benchmark loss evaluation
 │   ├── coarse.m                       # Coarse-grid baseline implementation
+│   ├── baseline/                      # Baseline resources
 │   ├── classes/                       # Object-oriented components
 │   │   ├── Server/                    # Server-side LP solver
 │   │   ├── User/                      # User-side surrogate fitting

@@ -1,174 +1,147 @@
-for user_data = 1:10
-    loss_baseline=zeros(9,4);  % change
-    for r_data = 1:4                % change
-        filename = sprintf('./nyc_location_data_6000_nodes/location_data_sample_%d/location_data_r%d_user%d.mat', user_data, r_data, user_data);
-        load(filename);
-        addpath('./functions/');
-        addpath('./functions/haversine');
-        opts = detectImportOptions('./Dataset/nyc/raw/nyc_nodes.csv');
-        opts = setvartype(opts, 'osmid', 'int64');
-        df_nodes = readtable('./Dataset/nyc/raw/nyc_nodes.csv', opts);
-        df_edges = readtable('./Dataset/nyc/raw/nyc_edges.csv');
-        col_longitude = table2array(df_nodes(:, 'x'));
-        col_latitude = table2array(df_nodes(:, 'y'));
-        parameters;
-        % [G, u, v] = graph_preparation(df_nodes, df_edges);
-        load('u_nyc.mat');
-        load('v_nyc.mat');
-        load('G_nyc.mat');
-        distance_matrix = distanceMatrix(col_longitude(node_tar), col_latitude(node_tar));
-        exp_4=exp(4*distance_matrix);
-        exp_7=exp(7*distance_matrix);
-        exp_10=exp(10*distance_matrix);
-        %% cost
-        NR_LOC = length(node_tar); 
-        NR_OBFLOC = size(obf_ID, 2); 
-        cost_matrix = zeros(NR_LOC, NR_OBFLOC); 
-        for i = 1:1:NR_LOC
-            [~, D] = shortestpathtree(G, node_tar(2)); 
-            for j = 1:1:NR_OBFLOC         
-                cost_matrix(i,j) = abs(D(node_tar(i))-D(node_tar(obf_ID(j)))); 
-            end
+%% Planar Laplace baseline runner
+% Run this script from the baseline artifact root. Results are aggregated
+% in memory and printed in paper-style tables; no result files are saved.
+
+clear;
+clc;
+
+%% Experiment configuration
+city = 'rome';                 % 'rome', 'london', or 'nyc'
+node_count = 2000;            % 2000, 4000, or 6000
+epsilons = [4, 7, 10];
+user_ids = 1:10;
+
+if strcmpi(city, 'london')
+    repeat_ids = 1:6;
+elseif strcmpi(city, 'rome') && node_count == 2000
+    repeat_ids = 1:5;
+else
+    repeat_ids = 1:4;
+end
+
+addpath('./functions/');
+addpath('./functions/haversine');
+
+%% Load the selected city once
+node_csv = sprintf('./Dataset/%s/raw/%s_nodes.csv', city, city);
+edge_csv = sprintf('./Dataset/%s/raw/%s_edges.csv', city, city);
+opts = detectImportOptions(node_csv);
+opts = setvartype(opts, 'osmid', 'int64');
+df_nodes = readtable(node_csv, opts);
+df_edges = readtable(edge_csv); %#ok<NASGU>
+col_longitude = table2array(df_nodes(:, 'x'));
+col_latitude = table2array(df_nodes(:, 'y'));
+
+graph_data = load(sprintf('G_%s.mat', city), 'G');
+G = graph_data.G;
+
+% Rows for each epsilon: utility loss, runtime, violation ratio.
+aggregate = zeros(3 * numel(epsilons), numel(repeat_ids));
+
+%% Run all users and repetitions
+for user_idx = 1:numel(user_ids)
+    user_id = user_ids(user_idx);
+    user_result = zeros(size(aggregate));
+
+    for repeat_idx = 1:numel(repeat_ids)
+        repeat_id = repeat_ids(repeat_idx);
+        data_file = fullfile(sprintf('%s_location_data_%d_nodes', city, node_count), ...
+            sprintf('location_data_sample_%d', user_id), ...
+            sprintf('location_data_r%d_user%d.mat', repeat_id, user_id));
+        sample = load(data_file);
+        node_tar = sample.node_tar;
+        obf_ID = sample.obf_ID;
+
+        if isfield(sample, 'lon_sel')
+            loc_lons = sample.lon_sel;
+        else
+            loc_lons = col_longitude(node_tar);
         end
-        cost_matrix = cost_matrix/NR_LOC;
-        %%
-        loc_lons=lon_sel;
-        loc_lats = lat_sel; 
+        if isfield(sample, 'lat_sel')
+            loc_lats = sample.lat_sel;
+        else
+            loc_lats = col_latitude(node_tar);
+        end
+
         pert_lons = col_longitude(obf_ID');
         pert_lats = col_latitude(obf_ID');
-        % epsilon4
-        [K, QL, time_laplace4] = planar_laplace_utility_loss( ...
-        loc_lons, loc_lats, ...
-        pert_lons, pert_lats, ...
-        cost_matrix, 4);
-        loss_4=sum(sum(cost_matrix .* K));
-        violation_matrix4=zeros(length(node_tar),length(node_tar));
-        % for i=1:length(node_tar)
-        %     for j=1:length(node_tar)
-        %         for k=1:length(obf_ID)
-        %             if K(i,k)/K(j,k)>exp_4(i,j)
-        %                 violation_matrix4(i,j)=violation_matrix4(i,j)+1;
-        %             end
-        %         end
-        %     end
-        % end
-        violation_rate4=sum(violation_matrix4(:))/(length(node_tar)*length(node_tar)*length(obf_ID));
-        % epsilon7
-        [K, QL, time_laplace7] = planar_laplace_utility_loss( ...
-        loc_lons, loc_lats, ...
-        pert_lons, pert_lats, ...
-        cost_matrix, 7);
-        loss_7=sum(sum(cost_matrix .* K));
-        violation_matrix7=zeros(length(node_tar),length(node_tar));
-        % for i=1:length(node_tar)
-        %     for j=1:length(node_tar)
-        %         for k=1:length(obf_ID)
-        %             if K(i,k)/K(j,k)>exp_7(i,j)
-        %                 violation_matrix7(i,j)=violation_matrix7(i,j)+1;
-        %             end
-        %         end
-        %     end
-        % end
-        violation_rate7=sum(violation_matrix7(:))/(length(node_tar)*length(node_tar)*length(obf_ID));
-        % epsilon10
-        [K, QL, time_laplace10] = planar_laplace_utility_loss( ...
-        loc_lons, loc_lats, ...
-        pert_lons, pert_lats, ...
-        cost_matrix, 10);
-        loss_10=sum(sum(cost_matrix .* K));
-        violation_matrix10=zeros(length(node_tar),length(node_tar));
-        % for i=1:length(node_tar)
-        %     for j=1:length(node_tar)
-        %         for k=1:length(obf_ID)
-        %             if K(i,k)/K(j,k)>exp_10(i,j)
-        %                 violation_matrix10(i,j)=violation_matrix10(i,j)+1;
-        %             end
-        %         end
-        %     end
-        % end
-        violation_rate10=sum(violation_matrix10(:))/(length(node_tar)*length(node_tar)*length(obf_ID));
-        % loss
-        loss_baseline(1,r_data)=loss_4;
-        loss_baseline(2,r_data)=time_laplace4;
-        loss_baseline(3,r_data)=violation_rate4;
 
-        loss_baseline(4,r_data)=loss_7;
-        loss_baseline(5,r_data)=time_laplace7;
-        loss_baseline(6,r_data)=violation_rate7;
+        nr_locations = numel(node_tar);
+        nr_outputs = numel(obf_ID);
+        cost_matrix = zeros(nr_locations, nr_outputs);
+        [~, path_distance] = shortestpathtree(G, node_tar(2));
+        for location_idx = 1:nr_locations
+            for output_idx = 1:nr_outputs
+                cost_matrix(location_idx, output_idx) = abs( ...
+                    path_distance(node_tar(location_idx)) - ...
+                    path_distance(node_tar(obf_ID(output_idx))));
+            end
+        end
+        cost_matrix = cost_matrix / nr_locations;
 
-        loss_baseline(7,r_data)=loss_10;
-        loss_baseline(8,r_data)=time_laplace10;
-        loss_baseline(9,r_data)=violation_rate10;
+        for eps_idx = 1:numel(epsilons)
+            epsilon = epsilons(eps_idx);
+            [mechanism, ~, runtime] = planar_laplace_utility_loss( ...
+                loc_lons, loc_lats, pert_lons, pert_lats, ...
+                cost_matrix, epsilon);
+            utility_loss = sum(sum(cost_matrix .* mechanism));
+
+            % Planar Laplace satisfies the target privacy definition by
+            % construction, so its violation ratio is zero.
+            violation_ratio = 0;
+            first_row = 3 * (eps_idx - 1) + 1;
+            user_result(first_row:first_row + 2, repeat_idx) = ...
+                [utility_loss; runtime; violation_ratio];
+        end
     end
-    save_name=sprintf('loss_baseline_nyc_user%d.mat', user_data);
-    save(save_name,'loss_baseline');
-    clear;
+
+    aggregate = aggregate + user_result;
 end
 
-
-%%
-dataDir = fullfile('.', 'baseline_laplace', 'nyc', '6000');
-
-% File name pattern
-filePattern = fullfile(dataDir, 'loss_baseline_nyc_user*.mat');
-
-% Get the list of files
-files = dir(filePattern);
-
-% Initialize the accumulator matrix
-sumMatrix = zeros(9,4);              %change
-
-% Iterate over the files and accumulate the results
-for k = 1:length(files)
-    filePath = fullfile(dataDir, files(k).name);
-    data = load(filePath);      
-    sumMatrix = sumMatrix + data.loss_baseline;  
+% Utility in the paper is the total over users. Runtime and violation ratio
+% are averaged over users before statistics across repetitions.
+for eps_idx = 1:numel(epsilons)
+    first_row = 3 * (eps_idx - 1) + 1;
+    aggregate(first_row + 1:first_row + 2, :) = ...
+        aggregate(first_row + 1:first_row + 2, :) / numel(user_ids);
 end
 
-% Display the result
-disp('Final accumulated 9-by-6 matrix:');
-disp(sumMatrix);
-sumMatrix=sumMatrix(1:9,1:4);            % change
-save(fullfile(dataDir, 'sumMatrix_nyc.mat'), 'sumMatrix');
+row_mean = mean(aggregate, 2);
+row_std = std(aggregate, 0, 2);
 
-sumMatrix(2:3,:)=sumMatrix(2:3,:)/10;
-sumMatrix(5:6,:)=sumMatrix(5:6,:)/10;
-sumMatrix(8:9,:)=sumMatrix(8:9,:)/10;
-%% mean std
-% Assume the matrix is named sumMatrix
+utility_mean = row_mean(1:3:end)' / 10000;
+utility_std = row_std(1:3:end)' / 10000;
+runtime_mean = row_mean(2:3:end)';
+runtime_std = row_std(2:3:end)';
+violation_mean = row_mean(3:3:end)';
+violation_std = row_std(3:3:end)';
 
-% Mean of each row
-row_mean = mean(sumMatrix, 2);
+%% Print paper-style tables
+fprintf('\nBaseline setting: city=%s, records=%d, users=%d, repetitions=%d\n', ...
+    upper(city), node_count, numel(user_ids), numel(repeat_ids));
+methods = {'Laplace'};
+print_paper_table('Utility loss (10,000 meters)', methods, epsilons, ...
+    utility_mean, utility_std, 2);
+print_paper_table('Violation ratio', methods, epsilons, ...
+    violation_mean, violation_std, 4);
+print_paper_table('Computation time (seconds)', methods, epsilons, ...
+    runtime_mean, runtime_std, 4);
 
-% Standard deviation of each row
-row_std = std(sumMatrix, 0, 2);
+function print_paper_table(title_text, methods, epsilons, means, deviations, digits)
+    fprintf('\n%s -- mean +/- standard deviation\n', title_text);
+    fprintf('%-12s', 'Method');
+    for idx = 1:numel(epsilons)
+        fprintf(' | epsilon=%-4g', epsilons(idx));
+    end
+    fprintf('\n%s\n', repmat('-', 1, 12 + 16 * numel(epsilons)));
 
-% Display the results as "mean +/- standard deviation"
-% disp('Mean +/- standard deviation for each row:');
-% for i = 1:3
-%     fprintf('Row %d: %.2f ± %.2f\n', i, row_mean(i)/10000, row_std(i)/10000);
-% end
-disp('Mean +/- standard deviation for each row:');
-for i = 1:1
-    fprintf('Row %d: %.2f ± %.2f\n', i, row_mean(i)/10000, row_std(i)*0.6198/10000);
-end
-
-for i = 2:3
-    fprintf('Row %d: %.4f ± %.4f\n', i, row_mean(i), row_std(i));
-end
-
-for i = 4:4
-    fprintf('Row %d: %.2f ± %.2f\n', i, row_mean(i)/10000, row_std(i)*0.6198/10000);
-end
-
-for i = 5:6
-    fprintf('Row %d: %.4f ± %.4f\n', i, row_mean(i), row_std(i));
-end
-
-for i = 7:7
-    fprintf('Row %d: %.2f ± %.2f\n', i, row_mean(i)/10000, row_std(i)*0.6198/10000);
-end
-
-for i = 8:9
-    fprintf('Row %d: %.4f ± %.4f\n', i, row_mean(i), row_std(i));
+    value_format = sprintf(' | %%.%df +/- %%.%df', digits, digits);
+    for method_idx = 1:numel(methods)
+        fprintf('%-12s', methods{method_idx});
+        for eps_idx = 1:numel(epsilons)
+            fprintf(value_format, means(method_idx, eps_idx), ...
+                deviations(method_idx, eps_idx));
+        end
+        fprintf('\n');
+    end
 end
