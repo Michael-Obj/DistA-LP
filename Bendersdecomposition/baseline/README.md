@@ -18,6 +18,8 @@ Then run one of the following entry files:
 run('EM_EMBR.m')
 run('laplace_baseline.m')
 run('PAnDA_baseline.m')
+run('COPT_baseline.m')
+run('LP_baseline.m')
 ```
 
 All paths used by these scripts are relative to the baseline root directory. No machine-specific absolute path needs to be changed.
@@ -31,8 +33,10 @@ All paths used by these scripts are relative to the baseline root directory. No 
 | Coarse-grid LP approximation (LP-A) | `EM_EMBR.m` | `coarse.m` |
 | Planar Laplace | `laplace_baseline.m` | `planar_laplace_utility_loss.m` |
 | PAnDA | `PAnDA_baseline.m` | `PAnDA.m` |
+| COPT | `COPT_baseline.m` | `COPT/compute_copt2.m` |
+| Original centralized metric-DP LP | `LP_baseline.m` | `functions/solve_metric_dp_lp.m` |
 
-`EM_EMBR.m` runs EM, RMP, and LP-A together. The other two entry files run Planar Laplace and PAnDA, respectively.
+`EM_EMBR.m` runs EM, RMP, and LP-A together. The remaining entry files run Planar Laplace, PAnDA, COPT, and the original centralized LP.
 
 ## 3. Experiment configuration
 
@@ -266,13 +270,64 @@ The artifact includes the Haversine helper package under:
 functions/haversine/
 ```
 
-## 11. Full LP and COPT
+## 11. COPT and the original centralized LP
 
-A runnable COPT implementation is not included in this baseline directory.
+The artifact now exposes both missing optimization baselines through the same experiment contract as the other primary runners:
 
-The full centralized LP is computationally infeasible at the evaluated domain sizes and is reported as unavailable or exceeding the 1,800-second timeout where applicable.
+```matlab
+run('COPT_baseline.m')
+run('LP_baseline.m')
+```
 
-`main_BD.m` is legacy/development code and is not an entry file for the baseline results described in this guide.
+Both runners use the common `city`, `node_count`, `epsilons`, and `user_ids` configuration. Their programmatic output is retained in `copt_results` or `lp_results`. In each result, `raw` is a MATLAB table with one row per city/size/user/repetition/epsilon case and the following important fields:
+
+```text
+method, status, utility_loss, violation_ratio, runtime_sec,
+exitflag, estimated_setup_bytes, detail
+```
+
+The centralized LP implements the original finite-domain metric-DP formulation. Its variables are the full mechanism probabilities `z(i,k)`, its objective is expected utility loss, every row sums to one, and it instantiates every pairwise constraint
+
+```text
+z(i,k) <= exp(epsilon * d(i,j)) * z(j,k).
+```
+
+COPT uses the supplied rectangular-domain implementation in `COPT/compute_copt2.m`; the adapter passes the real-output distance matrix, real-real distance matrix, road-network loss matrix, epsilon, lambda, and nearest-neighbor count.
+
+The solver-level interfaces are:
+
+```matlab
+[H, loss, runtime, result] = solve_copt_baseline( ...
+    distance_real_output, distance_real_real, cost_matrix, ...
+    epsilon, lambda, neighbor_count, solver_config);
+
+[Z, loss, runtime, result] = solve_metric_dp_lp( ...
+    distance_real_real, cost_matrix, epsilon, solver_config);
+```
+
+`result.status` is one of `optimal`, `time_limit`, `estimated_infeasible`, `infeasible`, `unbounded`, or `failed`. The returned mechanism and loss are empty/`NaN` unless a solver solution is available.
+
+The evaluated domains produce extremely large LP setup matrices. To prevent an artifact check from exhausting the machine before `linprog` starts, both runners perform a resource preflight. By default, a case whose estimated setup exceeds 4 GiB receives status `estimated_infeasible`, with utility and violation values left as `NaN`. This is a status result, not a fabricated experiment measurement.
+
+To force an actual attempt, set:
+
+```matlab
+allow_oversized = true;
+```
+
+`linprog` then receives a 1,800-second `MaxTime` limit. Constraint construction occurs before the solver, so forcing an oversized run can still exhaust memory during setup.
+
+For a quick executable interface check, set `record_limit` to at least 20 and reduce the users/epsilons, for example:
+
+```matlab
+user_ids = 1;
+epsilons = 4;
+record_limit = 20;
+```
+
+This preserves all 20 supplied output locations while reducing the real-record domain. It is only a smoke test and is not a paper result.
+
+`main_BD.m` remains legacy/development code and is not the implementation of the original centralized LP runner.
 
 ## 12. Auxiliary and precomputed files
 

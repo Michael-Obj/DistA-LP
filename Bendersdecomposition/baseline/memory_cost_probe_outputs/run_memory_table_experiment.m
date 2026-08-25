@@ -80,6 +80,8 @@ for city_idx = 1:numel(cfg.cities)
 
                 lp_est = estimate_full_lp_matrix_bytes(numel(node_tar), numel(obf_ID));
                 lpa_est = estimate_lpa_matrix_bytes(city_data.lon, city_data.lat, numel(obf_ID));
+                copt_est = estimate_lp_resources('COPT', ...
+                    numel(node_tar), numel(obf_ID), 5);
 
                 for eps_idx = 1:numel(cfg.epsilons)
                     epsilon = cfg.epsilons(eps_idx);
@@ -107,8 +109,12 @@ for city_idx = 1:numel(cfg.cities)
                             "estimated", lpa_est.A_bytes, NaN, detail);
                     end
 
+                    detail = sprintf( ...
+                        ['COPT implementation is available through COPT_baseline.m; ' ...
+                         'full solve skipped here; estimated setup bytes=%g'], ...
+                        copt_est.estimated_peak_bytes);
                     raw = append_raw(raw, city, node_count, user_id, repeat_id, epsilon, "COPT", ...
-                        "not_available", NaN, NaN, "COPT implementation is not present in the provided baseline folder");
+                        "estimated_infeasible", copt_est.estimated_peak_bytes, NaN, detail);
                 end
 
                 if cfg.run_panda

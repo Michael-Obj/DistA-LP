@@ -31,6 +31,7 @@ DistributedLP/
 │   └── main_test_Lowrank_SVD.m        # Tests low-rank SVD surrogates
 ├── Bendersdecomposition/              # Main DISTA-LP framework implementation
 │   ├── main.m                         # Primary experimental runner
+│   ├── main_surrogate.m               # surrogates experimental runner
 │   ├── parameters.m                   # Framework-specific parameters
 │   ├── PL_mean_std.m                  # Privacy loss statistics computation
 │   ├── loss_for_benchmark.m           # Benchmark loss evaluation
@@ -242,6 +243,7 @@ Bendersdecomposition/results/
 Each experiment produces:
 - **Utility Loss**: Expected distance between true and perturbed locations
 - **mDP Violation Ratio**: Fraction of tested constraints exceeding target privacy budget
+- **Surrogate Violation Ratio (ViolRatio)**: Fraction of tested surrogate constraints exceeding target privacy budget
 - **Relative Error (RelErr)**: Approximation fidelity vs. original coefficients
 - **Privacy Loss (PL)**: Empirical privacy loss distribution from uploads
 - **Computation Time**: Total runtime in seconds

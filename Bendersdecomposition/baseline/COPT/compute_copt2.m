@@ -1,0 +1,181 @@
+function [H, M, expected_loss, exitflag, solver_output] = compute_copt2( ...
+        D_rp, D_rr, loss_matrix, epsilon, lambda, r, solver_options)
+%COMPUTE_COPT2 COPT mechanism for rectangular real/output domains.
+%
+% This implementation is adapted from the supplied COPT code. The first
+% six arguments retain its original interface. solver_options is optional
+% and may contain max_time_seconds and display.
+
+    if nargin < 7 || isempty(solver_options)
+        solver_options = struct();
+    end
+    if ~isfield(solver_options, 'max_time_seconds')
+        solver_options.max_time_seconds = 1800;
+    end
+    if ~isfield(solver_options, 'display')
+        solver_options.display = 'off';
+    end
+
+    [n, m] = size(D_rp);
+    if ~isequal(size(D_rr), [n, n])
+        error('COPT:InvalidDistanceMatrix', ...
+            'D_rr must be an n-by-n matrix matching D_rp.');
+    end
+    if ~isequal(size(loss_matrix), [n, m])
+        error('COPT:InvalidLossMatrix', ...
+            'loss_matrix must have the same size as D_rp.');
+    end
+    if r < 1 || r > n || r ~= floor(r)
+        error('COPT:InvalidNeighborCount', ...
+            'r must be an integer between 1 and n.');
+    end
+
+    N = n * m;
+    Y_start = N + 1;
+    Y_end = Y_start + m - 1;
+    k_idx = Y_end + 1;
+    total_vars = k_idx;
+
+    % Build the r-nearest input set I(v) for each output v.
+    I = cell(m, 1);
+    is_near = false(n, m);
+    for v = 1:m
+        [~, idx] = sort(D_rp(:, v), 'ascend');
+        I{v} = idx(1:r);
+        is_near(I{v}, v) = true;
+    end
+
+    % Inequalities A*x <= b.
+    rows = [];
+    cols = [];
+    vals = [];
+    b = [];
+    row_count = 0;
+
+    % Worst-case utility upper bound for every real location.
+    for u = 1:n
+        row_count = row_count + 1;
+        for v = 1:m
+            idx = sub2ind([n, m], u, v);
+            if is_near(u, v)
+                coeff = loss_matrix(u, v) + lambda;
+                rows(end + 1) = row_count; %#ok<AGROW>
+                cols(end + 1) = idx; %#ok<AGROW>
+                vals(end + 1) = coeff; %#ok<AGROW>
+            else
+                y_idx = Y_start + v - 1;
+                coeff = loss_matrix(u, v) * exp(-epsilon * D_rp(u, v));
+                rows(end + 1) = row_count; %#ok<AGROW>
+                cols(end + 1) = y_idx; %#ok<AGROW>
+                vals(end + 1) = coeff; %#ok<AGROW>
+            end
+        end
+        rows(end + 1) = row_count; %#ok<AGROW>
+        cols(end + 1) = k_idx; %#ok<AGROW>
+        vals(end + 1) = -1; %#ok<AGROW>
+        b(end + 1, 1) = 0; %#ok<AGROW>
+    end
+
+    % Each unnormalized row has mass at least one.
+    for u = 1:n
+        row_count = row_count + 1;
+        for v = 1:m
+            idx = sub2ind([n, m], u, v);
+            if is_near(u, v)
+                rows(end + 1) = row_count; %#ok<AGROW>
+                cols(end + 1) = idx; %#ok<AGROW>
+                vals(end + 1) = -1; %#ok<AGROW>
+            else
+                y_idx = Y_start + v - 1;
+                rows(end + 1) = row_count; %#ok<AGROW>
+                cols(end + 1) = y_idx; %#ok<AGROW>
+                vals(end + 1) = -exp(-epsilon * D_rp(u, v)); %#ok<AGROW>
+            end
+        end
+        b(end + 1, 1) = -1; %#ok<AGROW>
+    end
+
+    % Full pairwise mDP constraints from the supplied rectangular version.
+    for w = 1:m
+        for u = 1:n
+            for v = 1:n
+                
+                if u == v
+                    continue;
+                end
+                row_count = row_count + 1;
+                idx_uw = sub2ind([n, m], u, w);
+                idx_vw = sub2ind([n, m], v, w);
+                rows(end + 1) = row_count; %#ok<AGROW>
+                cols(end + 1) = idx_uw; %#ok<AGROW>
+                vals(end + 1) = 1; %#ok<AGROW>
+                rows(end + 1) = row_count; %#ok<AGROW>
+                cols(end + 1) = idx_vw; %#ok<AGROW>
+                vals(end + 1) = -exp(epsilon * D_rr(u, v)); %#ok<AGROW>
+                b(end + 1, 1) = 0; %#ok<AGROW>
+            end
+        end
+    end
+    A = sparse(rows, cols, vals, row_count, total_vars);
+
+    % Far probabilities share an exponential-decay output weight Y(v).
+    Aeq_rows = [];
+    Aeq_cols = [];
+    Aeq_vals = [];
+    beq = [];
+    row_eq = 0;
+    for v = 1:m
+        u_all = find(~is_near(:, v));
+        for u = u_all'
+            row_eq = row_eq + 1;
+            idx_uv = sub2ind([n, m], u, v);
+            idx_yv = Y_start + v - 1;
+            Aeq_rows(end + 1) = row_eq; %#ok<AGROW>
+            Aeq_cols(end + 1) = idx_uv; %#ok<AGROW>
+            Aeq_vals(end + 1) = 1; %#ok<AGROW>
+            Aeq_rows(end + 1) = row_eq; %#ok<AGROW>
+            Aeq_cols(end + 1) = idx_yv; %#ok<AGROW>
+            Aeq_vals(end + 1) = -exp(-epsilon * D_rp(u, v)); %#ok<AGROW>
+            beq(end + 1, 1) = 0; %#ok<AGROW>
+        end
+    end
+    Aeq = sparse(Aeq_rows, Aeq_cols, Aeq_vals, row_eq, total_vars);
+
+    f = zeros(total_vars, 1);
+    f(k_idx) = 1;
+    lb = zeros(total_vars, 1);
+    options = optimoptions('linprog', ...
+        'Display', solver_options.display, ...
+        'MaxTime', solver_options.max_time_seconds, ...
+        MaxIterations=5e10,...
+        Algorithm="interior-point");
+    [x, ~, exitflag, solver_output] = linprog(f, A, b, Aeq, beq, lb, [], options);
+
+    H = [];
+    M = [];
+    expected_loss = NaN;
+    if isempty(x)
+        return;
+    end
+
+    M_opt = reshape(x(1:N), n, m);
+    Y = x(Y_start:Y_end);
+    M = zeros(n, m);
+    for u = 1:n
+        for v = 1:m
+            if is_near(u, v)
+                M(u, v) = M_opt(u, v);
+            else
+                M(u, v) = Y(v) * exp(-epsilon * D_rp(u, v));
+            end
+        end
+    end
+
+    row_sums = sum(M, 2);
+    H = M ./ row_sums;
+    zero_rows = row_sums <= 0 | ~isfinite(row_sums);
+    if any(zero_rows)
+        H(zero_rows, :) = 1 / m;
+    end
+    expected_loss = sum(H .* loss_matrix, 'all');
+end

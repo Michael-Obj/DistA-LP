@@ -649,18 +649,72 @@ writetable(Summary_s, 'Summary_SVD.csv');
 
 
 
+rowOrder = [3 2 1];    
 
-% Mean_Rel_DLR_s_  = mean(Rel_DLR_s(:),  'omitnan');   CI95_Rel_DLR_s_  = std(Rel_DLR_s(:),  0, 'omitnan');
-% Mean_Vio_DLR_s_  = mean(Viol_DLR_s(:), 'omitnan');   CI95_Vio_DLR_s_  = std(Viol_DLR_s(:), 0, 'omitnan');
-% Mean_Rel_DLR2_s_ = mean(Rel_DLR2_s(:), 'omitnan');   CI95_Rel_DLR2_s_ = std(Rel_DLR2_s(:), 0, 'omitnan');
-% Mean_Vio_DLR2_s_ = mean(Viol_DLR2_s(:),'omitnan');   CI95_Vio_DLR2_s_ = std(Viol_DLR2_s(:),0, 'omitnan');
-% Mean_Rel_CRL_s_  = mean(Rel_CRL_s(:),  'omitnan');   CI95_Rel_CRL_s_  = std(Rel_CRL_s(:),  0, 'omitnan');
-% 
-% Summary_s_ = table( ...
-%     ["Rel_DLR"; "Viol_DLR"; "Rel_DLR2"; "Viol_DLR2"; "Rel_CRL"], ...
-%     [Mean_Rel_DLR_s_;  Mean_Vio_DLR_s_;  Mean_Rel_DLR2_s_;  Mean_Vio_DLR2_s_;  Mean_Rel_CRL_s_], ...
-%     [CI95_Rel_DLR_s_;    CI95_Vio_DLR_s_;    CI95_Rel_DLR2_s_;    CI95_Vio_DLR2_s_;    CI95_Rel_CRL_s_], ...
-%     'VariableNames', {'Metric','Mean','StdDev'} ...
-% );
-% disp(Summary_s_);
-% writetable(Summary_s_, 'Summary_SVD_.csv');
+% 1. UTILITY LOSS
+N_utility = sum(~isnan(cost_test), 2);
+
+Mean_Utility = mean(cost_test, 2, 'omitnan') / 10000;
+
+CI95_Utility = 1.96 .* ...
+    std(cost_test, 0, 2, 'omitnan') ./ sqrt(N_utility) / 10000;
+
+Utility_Result = compose("%.2f +/- %.2f", ...
+                         Mean_Utility, CI95_Utility);
+
+Utility_Loss_Table = table( ...
+    Utility_Result(rowOrder(3)), ...
+    Utility_Result(rowOrder(2)), ...
+    Utility_Result(rowOrder(1)), ...
+    'VariableNames', {'epsilon_4','epsilon_7','epsilon_10'}, ...
+    'RowNames', {'DISTA_LP'});
+
+fprintf('\n================ UTILITY LOSS ================\n');
+disp(Utility_Loss_Table);
+
+
+
+% 2. VIOLATION RATIO
+
+N_violation = sum(~isnan(nr_violations), 2);
+
+Mean_Violation = mean(nr_violations, 2, 'omitnan');
+
+CI95_Violation = 1.96 .* ...
+    std(nr_violations, 0, 2, 'omitnan') ./ sqrt(N_violation);
+
+Violation_Result = compose("%.2f +/- %.2f", ...
+                           Mean_Violation, CI95_Violation);
+
+Violation_Ratio_Table = table( ...
+    Violation_Result(rowOrder(3)), ...
+    Violation_Result(rowOrder(2)), ...
+    Violation_Result(rowOrder(1)), ...
+    'VariableNames', {'epsilon_4','epsilon_7','epsilon_10'}, ...
+    'RowNames', {'DISTA_LP'});
+
+fprintf('\n=============== VIOLATION RATIO ===============\n');
+disp(Violation_Ratio_Table);
+
+
+
+% 3. COMPUTATION TIME
+N_time = sum(~isnan(computation_time), 2);
+
+Mean_Time = mean(computation_time, 2, 'omitnan');
+
+CI95_Time = 1.96 .* ...
+    std(computation_time, 0, 2, 'omitnan') ./ sqrt(N_time);
+
+Time_Result = compose("%.2f +/- %.2f", ...
+                      Mean_Time, CI95_Time);
+
+Computation_Time_Table = table( ...
+    Time_Result(rowOrder(3)), ...
+    Time_Result(rowOrder(2)), ...
+    Time_Result(rowOrder(1)), ...
+    'VariableNames', {'epsilon_4','epsilon_7','epsilon_10'}, ...
+    'RowNames', {'DISTA_LP'});
+
+fprintf('\n============== COMPUTATION TIME ===============\n');
+disp(Computation_Time_Table);
