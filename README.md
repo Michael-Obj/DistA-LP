@@ -76,18 +76,14 @@ DistA-LP/
 - **macOS Monterey/Ventura/Sonoma**
 - **Ubuntu Linux 20.04/22.04**
 
-## Tested Setup
-
-### Experimental Environment
+## Experimental Environment
 - **OS**: Windows 11
 - **CPU**: Intel Core i9-13900F
 - **CPU cores/threads**: 24 cores / 32 threads
 - **RAM**: 32 GB DDR5 (4800 MHz)
 - **GPU**: NVIDIA GeForce RTX 4090 with 24 GB GDDR6X VRAM
-
-### MATLAB Requirements
 - **MATLAB R2024b** 
-- **Required Toolboxes**:
+- **Toolboxes**:
   - **Optimization Toolbox** (for `linprog` and Benders decomposition)
   - **Statistics and Machine Learning Toolbox** (for `randsample` and statistical functions)
   - **Parallel Computing Toolbox** (for distributed subproblem solving)

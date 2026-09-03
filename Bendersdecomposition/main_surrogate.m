@@ -267,34 +267,7 @@ for r =  1:R
         save(fname, 'lon_sel','lat_sel','node_tar','LR_ID','obf_ID','cost_matrix','-v7.3');    
     end 
         
-
-
-    % for m = 1:NR_USER
-    %     % make region-specific subfolders
-    %     outG = sprintf('london_fig_surfaces_6000/r%02d/g', r);
-    %     outP = sprintf('london_fig_surfaces_6000/r%02d/p', r);
-    %     outR = sprintf('london_fig_surfaces_6000/r%02d/rbf', r);
-    %     outS = sprintf('london_fig_surfaces_6000/r%02d/svd', r);
-    % 
-    %     if ~exist(outG,'dir'), mkdir(outG); end
-    %     if ~exist(outP,'dir'), mkdir(outP); end
-    %     if ~exist(outR,'dir'), mkdir(outR); end
-    %     if ~exist(outS,'dir'), mkdir(outS); end
-    % 
-    %     % pass a full, user-specific stem to avoid collisions
-    %     stemG = sprintf('%s/fig_surfaces_g_r%02d_u%02d', outG, r, m);
-    %     stemP = sprintf('%s/fig_surfaces_p_r%02d_u%02d', outP, r, m);
-    %     stemR = sprintf('%s/fig_surfaces_r_r%02d_u%02d', outR, r, m);
-    %     stemS = sprintf('%s/fig_surfaces_s_r%02d_u%02d', outS, r, m);
-    % 
-    %     plot_all_surfaces_for_user_g(user(m), stemG);
-    %     plot_all_surfaces_for_user_p(user(m), stemP);
-    %     plot_all_surfaces_for_user_r(user(m), stemR);
-    %     plot_all_surfaces_for_user_s(user(m), stemS);
-    % end
-
-
-
+    
 
     for m = 1:NR_USER
         u = user(m); % (NR_USER=10 in your script)
@@ -441,22 +414,3 @@ Summary_s = table( ...
 );
 disp(Summary_s);
 writetable(Summary_s, 'Summary_SVD.csv');
-
-
-
-
-
-% Mean_Rel_DLR_s_  = mean(Rel_DLR_s(:),  'omitnan');   CI95_Rel_DLR_s_  = std(Rel_DLR_s(:),  0, 'omitnan');
-% Mean_Vio_DLR_s_  = mean(Viol_DLR_s(:), 'omitnan');   CI95_Vio_DLR_s_  = std(Viol_DLR_s(:), 0, 'omitnan');
-% Mean_Rel_DLR2_s_ = mean(Rel_DLR2_s(:), 'omitnan');   CI95_Rel_DLR2_s_ = std(Rel_DLR2_s(:), 0, 'omitnan');
-% Mean_Vio_DLR2_s_ = mean(Viol_DLR2_s(:),'omitnan');   CI95_Vio_DLR2_s_ = std(Viol_DLR2_s(:),0, 'omitnan');
-% Mean_Rel_CRL_s_  = mean(Rel_CRL_s(:),  'omitnan');   CI95_Rel_CRL_s_  = std(Rel_CRL_s(:),  0, 'omitnan');
-% 
-% Summary_s_ = table( ...
-%     ["Rel_DLR"; "Viol_DLR"; "Rel_DLR2"; "Viol_DLR2"; "Rel_CRL"], ...
-%     [Mean_Rel_DLR_s_;  Mean_Vio_DLR_s_;  Mean_Rel_DLR2_s_;  Mean_Vio_DLR2_s_;  Mean_Rel_CRL_s_], ...
-%     [CI95_Rel_DLR_s_;    CI95_Vio_DLR_s_;    CI95_Rel_DLR2_s_;    CI95_Vio_DLR2_s_;    CI95_Rel_CRL_s_], ...
-%     'VariableNames', {'Metric','Mean','StdDev'} ...
-% );
-% disp(Summary_s_);
-% writetable(Summary_s_, 'Summary_SVD_.csv');
