@@ -1,6 +1,8 @@
 # DISTA-LP: Privacy-Preserving Distributed Linear Programming for Metric Differential Privacy
 
 **Paper Title:** *DISTA-LP: Privacy-Preserving Distributed Linear Programming for Metric Differential Privacy*
+**Venue:** *Network and Distributed System Security Symposium (NDSS 2027)*
+**Date:** *2027*
 
 ## Description
 
@@ -20,10 +22,9 @@ DISTA-LP addresses a critical challenge in distributed privacy-preserving system
 ### Directory Structure
 
 ```
-DistributedLP/
+DistA-LP/
 ├── README.md                          # This file
 ├── parameters.m                       # Global parameter configuration
-├── main.m                             # Example usage script
 ├── main_test_*.m                      # Test scripts for different surrogate families
 │   ├── main_test_Gaussian.m           # Tests 2D Gaussian parametric surrogates
 │   ├── main_test_Polynomial.m         # Tests 2D polynomial parametric surrogates
@@ -74,14 +75,21 @@ DistributedLP/
 - **macOS Monterey/Ventura/Sonoma**
 - **Ubuntu Linux 20.04/22.04**
 
-## Environment Setup
+## Tested Setup
+
+### Experimental Environment
+- **OS**: Windows 11
+- **CPU**: Intel Core i9-13900F
+- **CPU cores/threads**: 24 cores / 32 threads
+- **RAM**: 32 GB DDR5 (4800 MHz)
+- **GPU**: NVIDIA GeForce RTX 4090 with 24 GB GDDR6X VRAM
 
 ### MATLAB Requirements
-- **MATLAB R2024b** or later
+- **MATLAB R2024b** 
 - **Required Toolboxes**:
   - **Optimization Toolbox** (for `linprog` and Benders decomposition)
   - **Statistics and Machine Learning Toolbox** (for `randsample` and statistical functions)
-  - **Parallel Computing Toolbox** (optional, for distributed subproblem solving)
+  - **Parallel Computing Toolbox** (for distributed subproblem solving)
 
 ### Installation
 1. Install MATLAB with the above toolboxes
@@ -368,3 +376,6 @@ lat = table2array(df_nodes(:, 'y'));
 - **RMP (Bayesian Remapping)**: Post-processing utility improvement 
 - **PAnDA**: Anchor-based distributed LP
 - **Coarse Grid LP**: Discretized LP on coarse spatial grid
+
+
+Anonymous GitHub Link: https://anonymous.4open.science/r/DistA-LP-D2F0/README.md
