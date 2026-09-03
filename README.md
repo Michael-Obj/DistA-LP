@@ -26,7 +26,6 @@ DISTA-LP addresses a critical challenge in distributed privacy-preserving system
 ```
 DistA-LP/
 ├── README.md                          # This file
-├── parameters.m                       # Global parameter configuration
 ├── main_test_*.m                      # Test scripts for different surrogate families
 │   ├── main_test_Gaussian.m           # Tests 2D Gaussian parametric surrogates
 │   ├── main_test_Polynomial.m         # Tests 2D polynomial parametric surrogates
