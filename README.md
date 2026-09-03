@@ -4,7 +4,7 @@
 
 **Venue:** *Network and Distributed System Security Symposium (NDSS 2027)*
 
-**Date:** *2027*
+**Date:** *2027 *
 
 ## Description
 
