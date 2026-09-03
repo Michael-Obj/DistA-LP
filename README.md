@@ -2,7 +2,7 @@
 
 **Paper Title:** *DISTA-LP: Privacy-Preserving Distributed Linear Programming for Metric Differential Privacy*
 
-**Venue:** *Network and Distributed System Security Symposium (NDSS 2027)*\
+**Venue:** *Network and Distributed System Security Symposium (NDSS 2027)*
 
 **Date:** *2027*
 
