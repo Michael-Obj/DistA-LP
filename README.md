@@ -94,6 +94,15 @@ DistA-LP/
 3. In MATLAB, navigate to the repository root directory
 4. The code will automatically add required paths via `addpath()` commands in main scripts
 
+## Response II running example
+
+The [two-user Section IV example](docs/response_ii_running_example.tex)
+traces construction of the three local coefficient blocks, surrogate
+parameter release, server reconstruction and Benders optimization, and
+private output sampling. The [implementation notes](docs/response_ii_implementation_notes.md)
+map that protocol to the current MATLAB classes and identify steps that
+the experimental driver does not implement as separate message exchanges.
+
 ## Quick Start
 
 ### Running the DISTA-LP Framework
