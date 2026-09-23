@@ -1,0 +1,75 @@
+% Paste after the three-step overview in Section IV, before Section IV-A.
+% This is an illustrative trace, not an experimental result or a privacy certificate.
+\paragraph{Running example (two users).}
+Consider two users whose true records are $x_2$ and $x_5$. Their locally
+relevant neighborhoods are $N_1=\{x_1,x_2,x_3\}$ and
+$N_2=\{x_4,x_5,x_6\}$, and both use the public output domain
+$Y=\{y_1,y_2,y_3\}$. To make the coefficient blocks explicit, place
+$x_1,\ldots,x_6$ at positions $0,\ldots,5$ on a line and
+$y_1,y_2,y_3$ at positions $0,2,4$. In this illustration
+$d(a,b)$ is the absolute difference between their positions.
+Each user constructs a $3\times3$ intra-neighborhood distance block,
+a $3\times3$ neighborhood-to-output distance block, and a
+$3\times3$ utility block:
+\[
+ A^{dx}_1=A^{dx}_2=
+ \begin{bmatrix}0&1&2\\1&0&1\\2&1&0\end{bmatrix},\quad
+ A^{dy}_1=\begin{bmatrix}0&2&4\\1&1&3\\2&0&2\end{bmatrix},\quad
+ A^{dy}_2=\begin{bmatrix}3&1&1\\4&2&0\\5&3&1\end{bmatrix}.
+\]
+For the illustrative loss $c_{x,y}=d(x,y)$ and a uniform prior over
+the six candidate secrets, $A^{cy}_m=A^{dy}_m/6$. The same $Y$
+indexes the columns of both users' rectangular blocks; it is not
+permuted. In a real road-network instance, the distances and losses
+are computed from the chosen graph and utility function rather than
+these one-dimensional toy coordinates.
+
+User $m$ may locally permute the rows of its three blocks, and both
+axes of $A^{dx}_m$, by a permutation matrix $E_m$ before fitting
+surrogates. For example, the orders $(x_3,x_1,x_2)$ and
+$(x_6,x_4,x_5)$ place the two true records in row 3 of their
+respective blocks. For each $t\in\{dx,dy,cy\}$, the user fits
+parameters $\Theta_m^t$ to the correspondingly permuted $A_m^t$;
+a rank-$r$ SVD surrogate is one possible choice. The toy blocks
+have only three rows, so $r\leq3$ here; the setting $r=5$ used in
+the large experiments does not apply to this toy instance. The
+user randomizes each parameter set separately to obtain
+$\widetilde\Theta_m^{dx}$, $\widetilde\Theta_m^{dy}$, and
+$\widetilde\Theta_m^{cy}$ under the respective upload budgets
+$\epsilon_{dx}$, $\epsilon_{dy}$, and $\epsilon_{cy}$. An
+ephemeral request tag $\tau_m$ associates these three uploads with
+the returned result. The tag and the upload payload must not contain
+the true-record label or the private row-to-record map.
+
+Given each tagged triple, the server reconstructs
+$\widetilde A_m^t=f_t(\widetilde\Theta_m^t)$ in the permuted row
+order. The upload auditor estimates the \emph{average over sampled
+record pairs and mechanism randomness} of the event that
+metric-normalized upload privacy loss exceeds the allocated
+threshold; a sampling estimate does not certify every fixed pair.
+The server uses only the reconstructed coefficients to formulate the
+shared WEM weights and two neighborhood subproblems. For example,
+a local mDP constraint for rows $i,j\in N_m$ and output $y_k$ is
+$z_{i,k}\leq\exp(\epsilon_{pt}\widetilde d_{i,j})z_{j,k}$;
+each row of $Z_{N_m\times Y}$ sums to one. At each Benders
+iteration the master proposes the shared weights and the two
+subproblems check feasibility and optimality, returning cuts if
+needed. After convergence the server returns one $3\times3$
+probability block, indexed by $\tau_m$, to each user.
+
+Each user keeps its own row-to-record map and selects the row for
+its true record. Under the illustrative permutations above, both
+select row 3 of their \emph{own} returned block; equivalently, they
+can undo the permutation locally with $E_m^\top$ and select the
+original row 2. The selected row defines a categorical
+distribution over the common $Y$. For example, if a selected row
+were $(0.2,0.5,0.3)$, a uniform draw $u=0.45$ would report $y_2$
+because $0.2<u\leq0.7$. These probabilities illustrate the sampling
+rule only; they are not claimed to be the optimizer's output.
+The report uses budget $\epsilon_{pt}$. Accounting for the three
+parameter releases and this final report requires
+$\epsilon_{dx}+\epsilon_{dy}+\epsilon_{cy}+\epsilon_{pt}
+\leq\epsilon$, together with the applicable probabilistic
+failure accounting. The server's reconstruction and optimization
+are post-processing of the released parameters and consume no
+additional budget.
